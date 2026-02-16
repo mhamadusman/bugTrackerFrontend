@@ -22,7 +22,7 @@ export class UserService {
   }
 
   static async getUser(id: string) {
-    const response = await api.get(`/users/${id}`);
+    const response = await api.get(`/users/?id=${id}`);
     return response?.data?.user || null;
   }
 

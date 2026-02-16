@@ -28,7 +28,7 @@ const Pagination = ({ currentPage, totalPages, totalItems, updatePage }: IPagina
 
     return (
         <>
-            <div className='px-20 px-3'>
+            <div className='lg:px-20 px-3'>
 
                 <div className="flex shrink-0 flex-wrap  items-center justify-between  py-4 bg-gray-50 border-t border-gray-100 gap-4">
 

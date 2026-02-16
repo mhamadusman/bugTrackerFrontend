@@ -5,36 +5,42 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { AuthSrvice } from '@/public/src/apiConfig/authService';
-import toast from 'react-hot-toast'; // Import Toaster
+import toast from 'react-hot-toast';
 import { LoadingIndicator } from '@/public/src/components/loadingIndicator/loadingIndicator';
+import { useForm } from 'react-hook-form';
+
+type FormData = {
+    name: string;
+    email: string;
+    phoneNumber: string;
+    password: string;
+    confirmPassword: string;
+};
 
 export default function Signup() {
-    const router = useRouter()
-    const searchParams = useSearchParams()
-    const userRole = searchParams.get('role')
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const userRole = searchParams.get('role');
+
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [loading, setLoading] = useState(false); // New Loading State
+    const [loading, setLoading] = useState(false);
 
-    const [userData, setUserData] = useState({
-        name: '',
-        email: '',
-        phoneNumber: '',
-        password: '',
-        confirmPassword: '',
-        userType: userRole || ''
-    })
-
-    const handleSignUp = async (e: React.FormEvent) => {
-        e.preventDefault(); 
-        
-        if (userData.password !== userData.confirmPassword) {
-            return toast.error("Passwords do not match!");
+    const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
+        defaultValues: {
+            name: '',
+            email: '',
+            phoneNumber: '',
+            password: '',
+            confirmPassword: ''
         }
+    });
+
+    const onSubmit = async (data: FormData) => {
 
         setLoading(true);
         try {
-            const response = await AuthSrvice.signup(userData);
+            await AuthSrvice.signup({ ...data, userType: userRole || '' });
             toast.success('Sign-up successful! Login to your account');
             router.push('/auth/login');
         } catch (error: any) {
@@ -43,19 +49,10 @@ export default function Signup() {
         } finally {
             setLoading(false);
         }
-    }
-
-    const handleUserData = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setUserData({
-            ...userData,
-            [name]: value,
-            userType: userRole || ''
-        });
     };
 
-    const inputBase = "peer w-full rounded-md border border-gray-100 bg-gray-100 px-10 py-3 text-sm text-gray-900 outline-none transition-colors focus:border-blue-500 focus:bg-gray-50";
-    const labelBase = "pointer-events-none absolute left-10 top-1/2 -translate-y-1/2 text-sm text-gray-400 transition-all duration-200 bg-gray-100 peer-focus:bg-gray-50 px-1 peer-focus:top-0 peer-focus:text-sm peer-focus:text-gray-600 peer-not-placeholder-shown:top-0 peer-not-placeholder-shown:text-xs";
+    const inputBase = "peer w-full rounded-md border px-10 py-3 text-sm text-gray-900 outline-none transition-colors  focus:bg-gray-50";
+    const labelBase = "pointer-events-none absolute z-50 w-auto left-10 top-1/2 -translate-y-1/2 text-sm text-gray-400 transition-all duration-200 peer-focus:bg-gray-50 px-1 peer-focus:top-0 peer-focus:text-sm peer-focus:text-gray-600 peer-not-placeholder-shown:top-0 peer-not-placeholder-shown:text-xs";
     const iconLeft = "absolute left-3 top-1/2 -translate-y-1/2 opacity-40 peer-focus:opacity-70 transition-opacity z-10";
     const eyeButton = "absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 focus:outline-none";
 
@@ -76,73 +73,106 @@ export default function Signup() {
                         </p>
                     </div>
 
-                    <form onSubmit={handleSignUp} className="space-y-4 lg:w-1/2 lg:ml-40">
-                        
+                    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 lg:w-1/2 lg:ml-40">
+
                         {/* name */}
                         <div className="relative">
                             <Image src="/images/profile.png" alt="icon" width={18} height={18} className={iconLeft} />
-                            <input type="text" name="name" required value={userData.name} onChange={handleUserData} placeholder=" " className={inputBase} />
-                            <label className={labelBase}>Name</label>
+                            <input
+                                type="text"
+                                placeholder=" "
+                                className={`${inputBase} ${errors.name ? 'border-red-500 focus:border-red-500' : 'border-gray-100 focus:border-blue-500 bg-gray-100'}`}
+                                {...register("name", { required: "Name is required" })}
+                            />
+                            <label className={`${labelBase} ${errors.name ? "top-0 text-xs bg-gray-50 px-1 text-red-500" : ""}`}>
+                                {errors.name ? errors.name.message : "Enter Name"}
+                            </label>
                         </div>
 
                         {/* mobile */}
                         <div className="relative">
                             <Image src="/images/solid.png" alt="icon" width={18} height={18} className={iconLeft} />
-                            <input type="tel" name="phoneNumber" required value={userData.phoneNumber} onChange={handleUserData} placeholder=" " className={inputBase} />
-                            <label className={labelBase}>Mobile number</label>
+                            <input
+                                type="tel"
+                                placeholder=" "
+                                className={`${inputBase} ${errors.phoneNumber ? 'border-red-500 focus:border-red-500' : 'border-gray-100 focus:border-blue-500 bg-gray-100'}`}
+                                {...register("phoneNumber", {
+                                    required: "Mobile number is required",
+                                    pattern: { value: /^\d{11}$/, message: "Must be exactly 11 digits" }
+                                })}
+                            />
+                            <label className={`${labelBase} ${errors.phoneNumber ? "top-0 text-xs bg-gray-50 px-1 text-red-500" : ""}`}>
+                                {errors.phoneNumber ? errors.phoneNumber.message : "Phone Number"}
+                            </label>
                         </div>
 
                         {/* email */}
                         <div className="relative">
                             <Image src="/images/Shape.png" alt="icon" width={18} height={18} className={iconLeft} />
-                            <input type="email" name="email" required value={userData.email} onChange={handleUserData} placeholder=" " className={inputBase} />
-                            <label className={labelBase}>E-mail</label>
+                            <input
+                                type="text"
+                                placeholder=" "
+                                className={`${inputBase} ${errors.email ? 'border-red-500 focus:border-red-500' : 'border-gray-100 focus:border-blue-500 bg-gray-100'}`}
+                                {...register("email", {
+                                    required: "Email is required",
+                                    pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: "Invalid email address" }
+                                })}
+                            />
+                            <label className={`${labelBase} ${errors.email ? "top-0 text-xs bg-gray-50 px-1 text-red-500" : ""}`}>
+                                {errors.email ? errors.email.message : "Email"}
+                            </label>
                         </div>
 
-                        {/* password */}
+                        {/* Password */}
                         <div className="relative">
                             <Image src="/icons/lock.png" alt="icon" width={18} height={18} className={iconLeft} />
-                            <input 
-                                type={showPassword ? "text" : "password"} 
-                                name="password" 
-                                required
-                                value={userData.password} 
-                                onChange={handleUserData} 
-                                placeholder=" " 
-                                className={inputBase} 
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                placeholder=" "
+                                className={`${inputBase} ${errors.password ? 'border-red-500 focus:border-red-500' : 'border-gray-100 focus:border-blue-500 bg-gray-100'}`}
+                                {...register("password", {
+                                    required: "Password is required",
+                                    minLength: {
+                                        value: 8,
+                                        message: "Password cannot be less than 8 characters"
+                                    }
+                                })}
                             />
-                            <label className={labelBase}>Password</label>
+                            <label className={`${labelBase} ${errors.password ? "top-0 text-xs bg-gray-50 px-1 text-red-500" : ""}`}>
+                                {errors.password ? errors.password.message : "Password"}
+                            </label>
                             <button type="button" onClick={() => setShowPassword(!showPassword)} className={eyeButton}>
                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                         </div>
 
-                        {/* confirm password */}
+                        {/* Confirm Password */}
                         <div className="relative">
                             <Image src="/icons/lock.png" alt="icon" width={18} height={18} className={iconLeft} />
-                            <input 
-                                type={showConfirmPassword ? "text" : "password"} 
-                                name="confirmPassword" 
-                                required
-                                value={userData.confirmPassword} 
-                                onChange={handleUserData} 
-                                placeholder=" " 
-                                className={inputBase} 
+                            <input
+                                type={showConfirmPassword ? "text" : "password"}
+                                placeholder=" "
+                                className={`${inputBase} ${errors.confirmPassword ? 'border-red-500 focus:border-red-500' : 'border-gray-100 focus:border-blue-500 bg-gray-100'}`}
+                                {...register("confirmPassword", {
+                                    required: 'Confirm your password',
+                                    validate: value => value === watch("password") || "Passwords must match"
+                                })}
                             />
-                            <label className={labelBase}>Confirm Password</label>
+                            <label className={`${labelBase} ${errors.confirmPassword ? "top-0 text-xs bg-gray-50 px-1 text-red-500" : ""}`}>
+                                {errors.confirmPassword ? errors.confirmPassword.message : "Confirm your password"}
+                            </label>
                             <button type="button" onClick={() => setShowConfirmPassword(!showConfirmPassword)} className={eyeButton}>
                                 {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                         </div>
 
+                        {/* Submit Button */}
                         <button
                             type="submit"
                             disabled={loading}
                             className="mybtn flex items-center justify-center gap-2"
                         >
-                            {loading ? (
-                                <LoadingIndicator />
-                            ) : (
+                            {loading ? <LoadingIndicator /> : (
                                 <>
                                     <span>Sign Up</span>
                                     <ArrowRight className="h-4 w-4" />
@@ -154,7 +184,6 @@ export default function Signup() {
 
                         <div className="flex items-center justify-center lg:justify-between gap-2 mt-10 lg:text-[14px] text-8px">
                             <p className="text-gray-500 whitespace-nowrap">Already have an Account?</p>
-                            <div className="h-3 hidden w-[1px] bg-gray-300"></div>
                             <Link href="/auth/login" className="text-blue-700 font-medium whitespace-nowrap">
                                 login to your account
                             </Link>
@@ -163,5 +192,5 @@ export default function Signup() {
                 </div>
             </div>
         </div>
-    )
+    );
 }

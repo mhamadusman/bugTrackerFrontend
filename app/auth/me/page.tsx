@@ -7,14 +7,9 @@ import { useEffect } from 'react';
 import { UserService } from '@/public/src/apiConfig/userService';
 import {  useRouter } from 'next/navigation';
 import toast from 'react-hot-toast'
-import { baseUrl } from '@/public/src/apiConfig/api';
-
-
-
-
-
-type img = string | null | File
+import variables from '../../../public/src/customVariables/custom_variables.json'
 export default function Profile() {
+    const baseUrl = variables.baseUrl
     const [user, setUser] = useState<profile>({
         name: '',
         email: '',
@@ -97,8 +92,6 @@ export default function Profile() {
 
 
     const imageValue = getImageValue()
-    console.log('image url in profile  :: ', imageValue)
-
     return (
         <div className="bg-gray-50 w-full flex justify-center min-h-screen">
             <div className="w-[92%] max-w-[1200px] lg:px-8 px-0">

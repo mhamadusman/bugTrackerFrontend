@@ -5,11 +5,11 @@ import Project from "@/public/src/components/project/project"
 import { redirect } from "next/navigation"
 
 interface DashboardProps{
-  searchParams: Promise<{page: string ,name: string}>
+  searchParams: Promise<{page: string ,name: string , limit: string}>
 }
 export default async function DashboardPage({searchParams}: DashboardProps) {
 
-  const {page , name} = await searchParams
+  const {page , name , limit} = await searchParams
   let projects: ProjectType[] = []
   let totalProjects
   let totalPages
@@ -23,16 +23,14 @@ export default async function DashboardPage({searchParams}: DashboardProps) {
     
     console.log('token value from cookie' , token)
     const response = await api.get('/projects', {
-      params: {page: page , name: name} ,
+      params: {page: page , name: name , limit: limit} ,
       headers: { Authorization: `Bearer ${token}` }
     })
-    projects = response.data.projects
+    projects = response.data.projectsWithDetails
     totalPages = response.data.pages
-    totalProjects = response.data.count
-    console.log(`these are the projects...... `, projects)
-
+    totalProjects = response.data.totalProjects
   } catch (error: any) {
-    console.log('error in fetching projects... ', error?.response?.message)
+    console.error('error in fetching projects... ', error?.response?.message)
   }
 
   return (

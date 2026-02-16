@@ -22,62 +22,107 @@ export interface loginDetails{
 }
 
 
+export interface UserType {
+  id: number;
+  name: string;
+  image: string | null;
+  userType: "developer" | "sqa";
+}
+
 export interface ProjectType {
   projectId: number;
-  managerId: number;
   name: string;
-  image: string ;
-  createdAt: Date;
-  updatedAt?: Date;
-  description?: string
-
+  description: string;
+  image: string | null;
+  devTeam: UserType[];
+  qaTeam: UserType[];
+  createdAt: string;     
+  updatedAt: string;     
+  taskComplete: number;
+  totalBugs: number;
 }
+
 
 export interface IProject{
-    id: number,
-    name: string,
-    description?: string,
-    image?: string;
+    id: number
+    name: string
+    description?: string
+    image?: string 
 }
-
-export interface  projectToEdit{
-  name: string,
-  id: number,
-  description?: string,
-  image?: string 
+export interface projectToEdit {
+  projectId: number;
+  name: string;
+  description: string;
+  image: string | null;
+  devTeam: UserType[];
+  qaTeam: UserType[];
 }
 
 export interface User {
-  id: string;
-  name: string;
-  userType: string;
-  image?: string 
+  id: string
+  name: string
+  userType: string
+  image: string 
+  email: string
 }
 
 type img = string | null | File
 
 export interface profile {
-   email: string,
-   password?: string,
-   phoneNumber: string,
+   role: string,
    image: img,
    name: string
 }
 //bug
-
 export interface BugType {
-    bugId: number;
-    title: string;
+    bugId: number
+    title: string
     description: string;
-    screenshot?: string | null;
-    deadline: string;
-    type: 'bug' | 'feature'; 
-    projectId?: number;
-    developerId?: number;
-    sqaId?: number;
-    status: 'pending' | 'in progress' | 'completed'; 
-    createdAt?: string;
-    updatedAt?: string;
+    screenshot: string | null
+    deadline: string
+    type: 'bug' | 'feature' 
+    projectId: number
+    developerId: number
+    sqaId: number
+    status: 'pending' | 'in progress' | 'completed'
+    createdAt: string
+    updatedAt: string
+    isClose: boolean
+    developerImage: string | null
+    developerName: string
+    sqaName: string
+    sqaImage: string  | null
+}
+
+export interface IBugDTO {
+  bugId: number;
+  title: string;
+  description: string;
+  status: string;
+  screenshot: string | null;
+  projectId: number;
+  developerId: number
+  deadline: string
+  sqaId: number
+  type: string
+  createdAt: string
+  updatedAt: string
+  isClose: boolean
+}
+interface IAssignedUser{
+  id: number
+  name: string
+  image: string
+}
+
+export interface IBugWithDeveloper {
+  bug: IBugDTO
+  developer: IAssignedUser
+  sqa: IAssignedUser
+}
+
+export interface IBugs {
+  bugs: IBugWithDeveloper[];
 }
 
 export interface BugResponse {

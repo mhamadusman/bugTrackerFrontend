@@ -18,10 +18,10 @@ export default function JoinUs() {
         
       </div>
 
-      {/* Right Side: Content */}
+      {/* right side image */}
       <div className="flex-1 flex flex-col bg-gray-50">
         
-        {/* Top Header */}
+        {/* top heeader */}
         <div className="p-8 text-right">
           <span className="text-gray-400 text-sm">Already have an account? </span>
           <Link href="/auth/login" className="text-blue-500 text-sm font-semibold hover:underline">
@@ -41,43 +41,55 @@ export default function JoinUs() {
 
             <div className="space-y-4">
               {/* Manager Box */}
-              <Link href="/auth/signup?role=manager" className="user-box bg-gray-200">
+              <Link href="/auth/signup?role=manager" className="user-box group">
                 <div className="flex items-center gap-4">
                   <div className="blue-circle-icon">
                     <Image src="/icons/user.png" alt="Icon" width={16} height={16} className="invert brightness-0" />
                   </div>
                   <div className="text-left">
                     <div className="user-role">Manager</div>
-                    <div className="text-[13px] text-gray-500">Signup as a manager to manage the tasks and bugs</div>
+                    <div className="text-[13px] text-gray-500 w-[250px]">Signup as a manager to manage the tasks and bugs</div>
                   </div>
                 </div>
-                <Image src="/icons/arrow-right.png" alt="Arrow" width={16} height={16} />
+                <div className='hidden group-hover:flex'>
+                  <Image src="/icons/arrow-right.png" alt="Arrow" width={16} height={16}
+                 />
+                </div>
+                
               </Link>
 
               {/* Developer Box */}
-              <Link href="/auth/signup?role=developer" className="user-box border border-gray-50 ">
+              <Link href="/auth/signup?role=developer" className="user-box group ">
                 <div className="flex items-center gap-4">
                   <div className="blue-circle-icon-ghost">
                     <Image src="/icons/briefcase.png" alt="Icon" width={16} height={16} className="text-blue-400" />
                   </div>
                   <div className="text-left">
                     <div className="user-role">Developer</div>
-                    <div className="text-[13px] text-gray-500">Signup as a Developer to assign the relevant task to QA</div>
+                    <div className="text-[13px] text-gray-500 w-[270px]">Signup as a Developer to assign the relevant task to QA</div>
                   </div>
+                  <div className='hidden group-hover:flex'>
+                     <Image src="/icons/arrow-right.png" alt="Arrow" width={16} height={16}
+                 />
+                   </div>
                 </div>
       
               </Link>
 
               {/* QA Box */}
-              <Link href="/auth/signup?role=sqa" className="user-box border border-gray-50 ">
+              <Link href="/auth/signup?role=sqa" className="user-box group">
                 <div className="flex items-center gap-4">
                   <div className="blue-circle-icon-ghost">
                     <Image src="/icons/Vector.png" alt="Icon" width={16} height={16} className="text-blue-400" />
                   </div>
                   <div className="text-left">
                     <div className="user-role">QA</div>
-                    <div className="text-[13px] text-gray-500">Signup as a QA to create the bugs and report in tasks</div>
+                    <div className="text-[13px] text-gray-500 w-[260px]">Signup as a QA to create the bugs and report in tasks</div>
                   </div>
+                </div>
+                <div className='hidden group-hover:flex'>
+                  <Image src="/icons/arrow-right.png" alt="Arrow" width={16} height={16}
+                 />
                 </div>
               </Link>
 

@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono, Poppins, Inter } from "next/font/google";
 import "./globals.css";
-import Navbar from '../public/src/components/navbar/navbar';
 import { Toaster } from 'react-hot-toast';
 
 const geistSans = Geist({

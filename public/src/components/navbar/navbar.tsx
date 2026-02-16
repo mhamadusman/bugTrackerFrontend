@@ -3,54 +3,48 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import api from "../../apiConfig/api";
 import { profile } from "../types/types";
-import { baseUrl } from "../../apiConfig/api";
+import variables from '../../customVariables/custom_variables.json'
 import { Menu } from "lucide-react";
-import toast from "react-hot-toast";
 import Logout from "../logout/logout";
-export default function Navbar() {
+import { UserService } from '../../apiConfig/userService';
 
+export default function Navbar() {
+  const baseUrl = variables.baseUrl
   const [menu, setMenu] = useState<boolean>(false)
-  type img = string | null
-  const [user, setUser] = useState({
+  const [user, setUser] = useState<profile>({
     name: '',
-    email: '',
-    password: '',
-    phoneNumber: '',
     role: '',
-    image: '' as img
-  })
+    image: ''
+  });
 
   const getProfile = async () => {
     try {
+      const data:profile  = await UserService.getProfile();
+      const info = {
+        name: data.name,
+        role: data.role,
+        image: data.image
+      };
 
-      const response = await api.get('/users/me')
-      const user = response.data.user
-      setUser({
-        name: user.name,
-        email: user.email,
-        password: user.password,
-        role: user.role,
-        phoneNumber: user.phoneNumber,
-        image: user?.image
-      })
+      setUser(info);
+      localStorage.setItem('user_profile', JSON.stringify(info));
+      localStorage.setItem('role', data.role);
 
     } catch (error: any) {
-      toast.error(`error in getting profile ${error.response.message}`)
+      localStorage.removeItem('user_profile');
     }
-  }
+  };
 
   useEffect(() => {
-    const fetch = () => {
-      getProfile()
-
+    const storedUser = localStorage.getItem('user_profile');
+    if (storedUser) {
+      setUser(JSON.parse(storedUser));
+    } else {
+      getProfile();
     }
-    fetch()
-  }, [])
- const imgurl = user.image ? `${baseUrl}${user.image}` : '/images/Profile.png';
-
-console.log('image url in nav bar ::', imgurl);
+  }, []);
+  const imgurl = user.image ? `${baseUrl}${user.image}` : '/images/Profile.png';
   const pathname = usePathname();
 
   return (
@@ -79,7 +73,7 @@ console.log('image url in nav bar ::', imgurl);
 
 
               <Link
-                href="/dashboard/bugs"
+                href="/dashboard/bugs?page=1"
                 className={`flex  hidden lg:flex items-center gap-2 text-[12px] transition-all ${pathname === "/dashboard/bugs" ? "text-gray-900 font-medium" : "text-gray-300"
                   }`}
               >
@@ -94,7 +88,7 @@ console.log('image url in nav bar ::', imgurl);
           </div>
           <div className="flex justify-between ">
             <div className="flex items-center justify-between lg:gap-3 gap-2">
-              <Image src="/icons/Notification.png" alt="bell" width={20} height={20} className="opacity-60" />
+              {/* <Image src="/icons/Notification.png" alt="bell" width={20} height={20} className="opacity-60" /> */}
               <Link href="/auth/me">
                 <div className="flex items-center gap-2 lg:bg-gray-100  px-3 py-1.5 rounded-lg">
                   <img src={imgurl} alt="user" className="rounded-full w-7 h-7" />
