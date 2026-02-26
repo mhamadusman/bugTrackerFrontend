@@ -97,7 +97,7 @@ export default function Model({ isOpen, onClose, project, resetEdit, users, setA
             formDataPayload.append("description", data.description);
             formDataPayload.append("developerIds", data.developerIds.join(','));
             formDataPayload.append("sqaIds", data.sqaIds.join(','));
-            formDataPayload.append("managerName", user.name);
+            formDataPayload.append("managerName", 'ali');
 
             if (data.image) {
                 formDataPayload.append("image", data.image);
