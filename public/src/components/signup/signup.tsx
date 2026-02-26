@@ -88,7 +88,7 @@ export default function Signup() {
 
                         {/* name */}
                         <div className="relative">
-                            <Image src="/images/profile.png" alt="icon" width={18} height={18} className={iconLeft} />
+                            <Image src="/images/Profile.png" alt="icon" width={18} height={18} className={iconLeft} />
                             <input
                                 type="text"
                                 placeholder=" "
@@ -102,7 +102,7 @@ export default function Signup() {
 
                         {/* mobile */}
                         <div className="relative">
-                            <Image src="/images/solid.png" alt="icon" width={18} height={18} className={iconLeft} />
+                            <Image src="/images/Solid.png" alt="icon" width={18} height={18} className={iconLeft} />
                             <input
                                 type="tel"
                                 placeholder=" "
