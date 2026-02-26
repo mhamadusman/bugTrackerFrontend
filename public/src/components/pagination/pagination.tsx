@@ -8,7 +8,7 @@ interface IPaginationProps {
 }
 
 const Pagination = ({ currentPage, totalPages, totalItems, updatePage }: IPaginationProps) => {
-    const pages = [];
+    const pages: (number | string)[] = [];
     const limit = 6;
 
     const startItem = (currentPage - 1) * limit + 1;
