@@ -3,7 +3,6 @@ import { useState, useRef, useEffect } from "react";
 import { X, Plus, CloudUpload, Calendar, ChevronDown, RotateCcw } from 'lucide-react';
 import { IBugDTO, IBugWithDeveloper, User } from '../types/types';
 import { BugService } from "../../apiConfig/bugService";
-import variables from '../../customVariables/custom_variables.json'
 import toast from "react-hot-toast";
 import { LoadingIndicator } from "../loadingIndicator/loadingIndicator";
 import { useForm } from "react-hook-form";
@@ -22,7 +21,7 @@ interface bugModelProps {
 }
 
 export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, resetEdit, developers, setAllBugs }: bugModelProps) {
-    const baseUrl = variables.baseUrl
+    const baseUrl  = process.env.NEXT_BACKEND_URL
     const [images, setImages] = useState<(string | undefined)[]>([])
     const [openDev, setOpenDev] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
