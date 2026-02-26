@@ -36,7 +36,8 @@ export class UserService {
   // }
 
   static async updateProfile(data: FormData) {
-    await api.patch('/users/update', data);
+    const response = await api.patch('/users/update', data);
+    return response
   }
 
   static async getProfile(): Promise<profile> {

@@ -72,10 +72,19 @@ export default function Profile() {
                 formData.append("image", profileImage);
             }
 
-            await UserService.updateProfile(formData);
-            toast.success('Profile updated...');
+            const response = await UserService.updateProfile(formData);
+            const existingProfile = JSON.parse(localStorage.getItem('user_profile') || '{}');
+
+            const updatedProfile = {
+                ...existingProfile,
+                name: data.name,
+                image:  profileImage,
+              
+            };
+
+            localStorage.setItem('user_profile', JSON.stringify(updatedProfile));
+            toast.success(response.data.message);
             setValue("password", "");
-            router.refresh();
         } catch (error: any) {
             const backendErrors = error?.response?.data?.errors;
             const genericMessage = error?.response?.data?.message || "Something went wrong";
@@ -162,8 +171,8 @@ export default function Profile() {
                                         value: /^\+?\d+$/,
                                         message: "Provide valid number"
                                     },
-                                    
-                                    
+
+
                                 })}
                                 placeholder=" "
                                 className={`${inputBase} ${errors.phoneNumber ? "border-red-500 focus:border-red-500" : ""}`}
