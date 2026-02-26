@@ -4,20 +4,19 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { profile } from "../types/types";
-import variables from '../../customVariables/custom_variables.json'
 import { Menu } from "lucide-react";
 import Logout from "../logout/logout";
 import { UserService } from '../../apiConfig/userService';
 
 export default function Navbar() {
-  const baseUrl = variables.baseUrl
+  
   const [menu, setMenu] = useState<boolean>(false)
-  const [user, setUser] = useState<profile>({
+  const [user, setUser] = useState({
     name: '',
     role: '',
     image: ''
   });
-
+  
   const getProfile = async () => {
     try {
       const data:profile  = await UserService.getProfile();
@@ -26,6 +25,7 @@ export default function Navbar() {
         role: data.role,
         image: data.image
       };
+      console.log('user profile in nav bar :: ', data)
 
       setUser(info);
       localStorage.setItem('user_profile', JSON.stringify(info));
@@ -44,7 +44,8 @@ export default function Navbar() {
       getProfile();
     }
   }, []);
-  const imgurl = user.image ? `${baseUrl}${user.image}` : '/images/Profile.png';
+  const imgurl = user.image ? `/api${user.image}` : '/images/Profile.png';
+  console.log('user image url in nav  :: ' , imgurl)
   const pathname = usePathname();
 
   return (
@@ -60,7 +61,7 @@ export default function Navbar() {
 
               <Link
                 href="/dashboard"
-                className={`flex hidden lg:flex items-center gap-2  lg:text-[12px] transition-all ${pathname === "/dashboard" ? "text-gray-900 font-medium" : "text-gray-300"
+                className={`hidden lg:flex items-center gap-2  lg:text-[12px] transition-all ${pathname === "/dashboard" ? "text-gray-900 font-medium" : "text-gray-300"
                   }`}
               >
                 <Image
@@ -74,7 +75,7 @@ export default function Navbar() {
 
               <Link
                 href="/dashboard/bugs?page=1"
-                className={`flex  hidden lg:flex items-center gap-2 text-[12px] transition-all ${pathname === "/dashboard/bugs" ? "text-gray-900 font-medium" : "text-gray-300"
+                className={`hidden lg:flex items-center gap-2 text-[12px] transition-all ${pathname === "/dashboard/bugs" ? "text-gray-900 font-medium" : "text-gray-300"
                   }`}
               >
                 <Image
@@ -89,7 +90,7 @@ export default function Navbar() {
           <div className="flex justify-between ">
             <div className="flex items-center justify-between lg:gap-3 gap-2">
               {/* <Image src="/icons/Notification.png" alt="bell" width={20} height={20} className="opacity-60" /> */}
-              <Link href="/auth/me">
+              <Link href="/dashboard/profile">
                 <div className="flex items-center gap-2 lg:bg-gray-100  px-3 py-1.5 rounded-lg">
                   <img src={imgurl} alt="user" className="rounded-full w-7 h-7" />
                   <span className="text-sm font-medium text-gray-700 hidden lg:flex capitalize">{user.role}</span>

@@ -1,5 +1,5 @@
 
-import api from './api';
+import {api} from '../apiConfig/api'
 import { signup  , loginDetails} from '../components/types/types';
 
 export class AuthSrvice {

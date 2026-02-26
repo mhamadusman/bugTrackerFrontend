@@ -1,8 +1,9 @@
 "use client"
 import { X, ChevronDown, User as UserIcon } from 'lucide-react';
-import {IBugWithDeveloper, ProjectType } from '../types/types';
+import { IBugWithDeveloper, ProjectType } from '../types/types';
+import Image from 'next/image';
 import { useState } from 'react';
-import variables from '../../customVariables/custom_variables.json'
+
 
 interface BugDetailsProps {
     item?: IBugWithDeveloper;
@@ -12,7 +13,6 @@ interface BugDetailsProps {
 }
 
 export default function BugDetailsModel({ item, onClose, role, project }: BugDetailsProps) {
-    const baseUrl = variables.baseUrl
     const [showDevDropdown, setShowDevDropdown] = useState(false);
     const [showSqaDropdown, setShowSqaDropdown] = useState(false);
     const getStatusStyles = (status: string) => {
@@ -59,20 +59,26 @@ export default function BugDetailsModel({ item, onClose, role, project }: BugDet
                                                         <div key={s.id} className="px-3 py-2 flex items-center gap-2 hover:bg-gray-50 text-[11px]">
                                                             {s.image ? (
                                                                 <>
-                                                                    <img
-                                                                        src={`${baseUrl}${s.image}`}
+                                                                    <Image
+                                                                        unoptimized={true}
+                                                                        src={`/api${s.image}`}
                                                                         alt='qaImage'
-                                                                        className="inline-block size-6 w-5 h-5 rounded-full ring-1 ring-white outline -outline-offset-1 outline-white"
+                                                                        width={100}
+                                                                        height={100}
+                                                                        className="inline-block size-6 w-5 h-5 rounded-full "
                                                                     />
                                                                     {s.name}
                                                                 </>
 
                                                             ) : (
                                                                 <>
-                                                                    <img
+                                                                    <Image
+                                                                        unoptimized={true}
+                                                                        width={100}
+                                                                        height={100}
                                                                         src='/images/Profile.png'
                                                                         alt='qaImage'
-                                                                        className="inline-block size-6 w-5 h-5 rounded-full ring-1 ring-white outline -outline-offset-1 outline-white"
+                                                                        className="inline-block size-6 w-5 h-5 rounded-full "
                                                                     />
                                                                     {s.name}
                                                                 </>
@@ -111,10 +117,13 @@ export default function BugDetailsModel({ item, onClose, role, project }: BugDet
                                                         <div key={d.id} className="px-3 py-2 flex items-center gap-2 hover:bg-gray-50 text-[11px]">
                                                             {d.image ? (
                                                                 <>
-                                                                    <img
-                                                                        src={`${baseUrl}${d.image}`}
-                                                                        alt='qaImage'
-                                                                        className="inline-block size-6 w-5 h-5 rounded-full ring-1 ring-white outline -outline-offset-1 outline-white"
+                                                                    <Image
+                                                                        unoptimized={true}
+                                                                        width={100}
+                                                                        height={100}
+                                                                        src={`/api${d.image}`}
+                                                                        alt='devImage'
+                                                                        className="inline-block size-6 w-5 h-5 rounded-full "
                                                                     />
                                                                     {d.name}
 
@@ -122,10 +131,13 @@ export default function BugDetailsModel({ item, onClose, role, project }: BugDet
 
                                                             ) : (
                                                                 <>
-                                                                    <img
+                                                                    <Image
+                                                                        unoptimized={true}
+                                                                        width={100}
+                                                                        height={100}
                                                                         src='/images/Profile.png'
-                                                                        alt='qaImage'
-                                                                        className="inline-block size-6 w-5 h-5 rounded-full ring-1 ring-white outline -outline-offset-1 outline-white"
+                                                                        alt='devImage'
+                                                                        className="inline-block size-6 w-5 h-5 rounded-full "
                                                                     />
                                                                     {d.name}
                                                                 </>
@@ -142,7 +154,7 @@ export default function BugDetailsModel({ item, onClose, role, project }: BugDet
                         </div>
                         <div className="flex items-center gap-4 ml-auto">
                             <div className="text-right">
-                                <p className="text-[9px] text-gray-400 uppercase font-bold">Created Date</p>
+                                <p className="text-[9px] text-gray-400 uppercase font-bold">Created</p>
                                 <p className="text-[10px] sm:text-[11px] text-gray-700 font-medium">
                                     {project.createdAt && project.createdAt !== null ? new Date(project.createdAt).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' }) : "N/A"}
                                 </p>
@@ -161,7 +173,7 @@ export default function BugDetailsModel({ item, onClose, role, project }: BugDet
                             <p className="text-[10px] text-gray-400 uppercase font-bold mb-2">Project Image</p>
                             {project.image && project.image !== "null" ? (
                                 <div className="w-full h-40 sm:h-48 bg-gray-50 border border-gray-100 rounded-sm overflow-hidden">
-                                    <img src={`${baseUrl}${project.image}`} alt="project" className="w-full h-full object-contain" />
+                                    <img src={`/api${project.image}`} alt="project" className="w-full h-full object-contain" />
                                 </div>
                             ) : <div className="w-full h-24 border border-dashed border-gray-200 rounded-sm flex items-center justify-center text-gray-400 italic text-[11px]">No image provided</div>}
                         </div>
@@ -237,7 +249,7 @@ export default function BugDetailsModel({ item, onClose, role, project }: BugDet
                         <p className="text-[10px] text-gray-400 uppercase font-bold mb-2">Screenshoot</p>
                         {item?.bug?.screenshot && item?.bug?.screenshot !== "null" ? (
                             <div className="w-full h-40 sm:h-48 bg-gray-50 border border-gray-100 rounded-sm overflow-hidden">
-                                <img src={`${baseUrl}${item?.bug.screenshot}`} alt="item?.bug" className="w-full h-full object-contain" />
+                                <img src={`/api${item?.bug.screenshot}`} alt="item?.bug" className="w-full h-full object-contain" />
                             </div>
                         ) : <div className="w-full h-24 border border-dashed border-gray-200 rounded-sm flex items-center justify-center text-gray-400 italic text-[11px]">No screenshot provided</div>}
                     </div>

@@ -4,7 +4,7 @@ import { useState, useRef } from "react";
 import { IBugDTO, IBugWithDeveloper } from "../types/types";
 import { BugService } from "../../apiConfig/bugService";
 import { useRouter } from 'next/navigation'
-import variables from '../../customVariables/custom_variables.json'
+
 import toast from "react-hot-toast";
 
 interface bugProps {
@@ -18,7 +18,7 @@ interface bugProps {
 }
 
 export default function BugRow({ item, setIsModalOpen, handleBugData, setEdit, setAllBugs , role, handleViewDetails }: bugProps) {
-    const baseUrl = variables.baseUrl
+    const baseUrl = process.env.NEXT_BACKEND_URL
     const router = useRouter()
     const [showDropDown, setShowDropDown] = useState<boolean>(false)
     const [show, setShow] = useState<boolean>(false)

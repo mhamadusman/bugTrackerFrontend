@@ -8,7 +8,6 @@ import BugDetailsModel from "../bug/bugDetailsModel";
 import Pagination from "../pagination/pagination";
 import { useRouter } from "next/navigation";
 import debounce from 'lodash.debounce';
-import { profile } from "../types/types";
 import { UserService } from "../../apiConfig/userService";
 import { LoadingIndicator } from "../loadingIndicator/loadingIndicator";
 import { User } from "../types/types";
@@ -27,9 +26,9 @@ export default function Project({ projects, totalPages, totalProjects }: project
     const [isDetailsOpen, setIsDetailsOpen] = useState<boolean>(false)
     const [currentPage, setCurrentPage] = useState(1)
     const [users, setUsers] = useState<User[]>([])
-    const [showLoading , setLoading]  = useState(false)
-    const [name, setName] = useState('')
-    const [user, setUser] = useState<profile>({
+    const [showLoading, setLoading] = useState(false)
+    const [projectName, setProjectName] = useState('')
+    const [user, setUser] = useState({
         name: '',
         role: '',
         image: ''
@@ -41,7 +40,7 @@ export default function Project({ projects, totalPages, totalProjects }: project
             router.push(`/dashboard?page=${currentPage}`);
         }
     }, 500),
-    [router, currentPage]);
+        [router, currentPage]);
 
     const setPage = (page: number) => {
         setCurrentPage(page)
@@ -104,9 +103,11 @@ export default function Project({ projects, totalPages, totalProjects }: project
     }, []);
     useEffect(() => {
         setAllProjects(projects)
+    }, [projects])
+    useEffect(() => {
         setLoading(false)
     }, [projects])
-       if (showLoading) {
+    if (showLoading) {
         return (
             <div className="flex min-h-screen items-center justify-between ">
                 <LoadingIndicator />
@@ -119,20 +120,20 @@ export default function Project({ projects, totalPages, totalProjects }: project
                 {/* header section serch bar and add button  */}
                 <div className="shrink-0 px-3  lg:px-20">
                     <header className="border-t border-b border-gray-200  py-3 mb-2 lg:mb-4">
-                        <div className="flex flex-col md:flex-row md:items-end justify-between gap-2  lg:gap-4">
+                        <div className="flex flex-col md:flex-row  justify-between gap-2  lg:gap-4">
                             <div className="border-l-4 border-[#43A67F] pl-4">
                                 <h5 className="font-poppins text-md lg:text-lg font-bold text-gray-900 ">Visnext Software Solutions</h5>
                                 <p className="font-poppins text-xs text-gray-400">Hi <span className="capitalize font-bold text-gray-700">{user.name}</span>, welcome to ManageBug</p>
                             </div>
-                            <div className="flex  items-center gap-3">
+                            <div className="flex  items-center justify-between gap-3">
                                 <div className={`relative`}>
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 h-4 w-4" />
                                     <input
                                         type="text"
-                                        value={name}
+                                        value={projectName}
                                         onChange={(e) => {
                                             const value = e.target.value;
-                                            setName(value);
+                                            setProjectName(value);
                                             filterProjectsUsingName(value);
                                         }}
                                         placeholder="Search for Projects here"
@@ -157,7 +158,7 @@ export default function Project({ projects, totalPages, totalProjects }: project
                 {/* projects  */}
                 <div className="flex-1 overflow-y-auto px-3 lg:px-20 lg:pb-4 no-scrollbar">
                     {allProjects && allProjects.length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-2">
+                        <div className="grid  grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-2 lg:gap-2">
                             {allProjects.map((project) => (
                                 <ProjectCard
                                     key={project.projectId}

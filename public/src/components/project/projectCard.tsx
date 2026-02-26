@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { ProjectService } from "../../apiConfig/projectService";
 import { projectToEdit } from "../types/types";
 import { ProjectType } from "../types/types";
-import variables from '../../customVariables/custom_variables.json'
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 
 interface projectCardProps {
@@ -18,7 +18,6 @@ interface projectCardProps {
 }
 
 export default function ProjectCard({ project, sendProject, setIsModalOpen, handleViewProjectDetails, setAllProjects }: projectCardProps) {
-    const baseUrl = variables.baseUrl
     const dropdownRef = useRef<HTMLDivElement>(null);
     const router = useRouter();
     const [show, setShow] = useState<boolean>(false)
@@ -26,7 +25,7 @@ export default function ProjectCard({ project, sendProject, setIsModalOpen, hand
 
 
     const fallbackImage = '/icons/pro2.png';
-    const imageUrl = (project.image && project.image !== "null") ? `${baseUrl}${project.image}` : fallbackImage;
+    const imageUrl = (project.image && project.image !== "null") ? `'/api'${project.image}` : fallbackImage;
     const onDetailsClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         handleViewProjectDetails(project);
@@ -99,8 +98,8 @@ export default function ProjectCard({ project, sendProject, setIsModalOpen, hand
             onClick={handleCardClick}
             className="bg-white py-3 px-6 mt-2 rounded-sm shadow-xs relative border-none cursor-pointer group hover:bg-white hover:shadow-lg transition-all"
         >
-            <div className="w-8 h-8 mb-4 rounded-sm overflow-hidden flex items-center justify-center bg-teal-100">
-                <img src={imageUrl} alt="fallback" className="w-8 h-8 object-cover" />
+            <div className="w-8 h-8 mb-4 rounded-sm overflow-hidden flex items-center justify-center ">
+                <Image unoptimized={true} width={31} height={31} src={imageUrl} alt="fallback" className="object-cover" />
             </div>
 
             <button

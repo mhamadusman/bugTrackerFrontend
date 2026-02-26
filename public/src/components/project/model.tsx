@@ -1,13 +1,14 @@
 "use client"
 import { useState, useRef, useEffect } from "react";
 import { useForm } from "react-hook-form";
-import { ImageIcon, X } from 'lucide-react';
+import { ImageIcon, Variable, X } from 'lucide-react';
 import { projectToEdit, User, ProjectType } from '../types/types';
 import { ProjectService } from "../../apiConfig/projectService";
-import { profile } from "../types/types";
 import toast from 'react-hot-toast';
 import { useRouter } from "next/navigation";
 import { LoadingIndicator } from "../loadingIndicator/loadingIndicator";
+import { projectForm , imageType } from "../types/types";
+
 interface AddProjectModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -17,19 +18,20 @@ interface AddProjectModalProps {
     users: User[]
     setAllProjects: React.Dispatch<React.SetStateAction<ProjectType[]>>;
 }
-type imageType = string | File | null
+
+const baseURL  = process.env.NEXT_BACKEND_URL
 export default function Model({ isOpen, onClose, project, resetEdit, users, setAllProjects }: AddProjectModalProps) {
     const [devs, setDevs] = useState(false)
     const [model, setModel] = useState(false)
     const router = useRouter()
-    const [user, setUser] = useState<profile>({
+    const [user, setUser] = useState({
         name: '',
         image: '',
         role: ''
     })
     const [searchTerm, setSearchTerm] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
-    const { register, handleSubmit, setValue, watch, reset, formState: { errors, isSubmitting } } = useForm({
+    const { register, handleSubmit, setValue, watch, reset, setError, formState: { errors, isSubmitting } } = useForm<projectForm>({
         defaultValues: {
             name: "",
             description: "",
@@ -95,13 +97,7 @@ export default function Model({ isOpen, onClose, project, resetEdit, users, setA
             formDataPayload.append("description", data.description);
             formDataPayload.append("developerIds", data.developerIds.join(','));
             formDataPayload.append("sqaIds", data.sqaIds.join(','));
-
-            const devEmails = users.filter((user) => data.developerIds.includes(user.id)).map((user) => user.email);
-            const qaEmails = users.filter((user) => data.sqaIds.includes(user.id)).map((user) => user.email);
-
-            formDataPayload.append("qaEmails", qaEmails.join(','));
-            formDataPayload.append("devEmails", devEmails.join(','));
-            formDataPayload.append("managerName", user.name);
+            formDataPayload.append("managerName", "ali");
 
             if (data.image) {
                 formDataPayload.append("image", data.image);
@@ -109,19 +105,33 @@ export default function Model({ isOpen, onClose, project, resetEdit, users, setA
 
             if (data.id) {
 
-                await ProjectService.updateProject(formDataPayload, data.id);
-                toast.success('Project updated');
+                const response = await ProjectService.updateProject(formDataPayload, data.id);
+                toast.success(response.message)
             } else {
 
-                await ProjectService.createProject(formDataPayload);
-                toast.success('Project added');
+                const response = await ProjectService.createProject(formDataPayload);
+                toast.success(response.message);
             }
             router.refresh();
             handleState();
             reset();
 
         } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Something went wrong");
+
+            const backendErrors = error?.response?.data?.errors;
+            const genericMessage = error?.response?.data?.message || "Something went wrong";
+            if (Array.isArray(backendErrors)) {
+                backendErrors.forEach((err: { field: string; message: string }) => {
+
+                    setError(err.field as keyof projectForm ,  {
+                        type: "server",
+                        message: err.message
+                    });
+
+                });
+            } else {
+                toast.error(genericMessage);
+            }
         }
     };
     const getDisplayNames = (type: "sqa" | "developer") => {
@@ -143,6 +153,7 @@ export default function Model({ isOpen, onClose, project, resetEdit, users, setA
             >
                 <div className="bg-white w-full max-w-2xl rounded-sm shadow-lg p-6">
                     <h2 className="text-lg font-light text-gray-800 mb-6">{project?.projectId ? "Edit project" : "Add new project"}</h2>
+                    {/* project form */}
                     <form onSubmit={handleSubmit(onFormSubmit)} className="flex gap-8">
                         <div className="flex-1 flex flex-col gap-4">
                             {/* project Name */}
@@ -223,7 +234,7 @@ export default function Model({ isOpen, onClose, project, resetEdit, users, setA
                             <div onClick={() => { fileInputRef.current?.click(); }} className="w-full aspect-square border-2 border-dashed border-gray-200 rounded-md flex flex-col items-center justify-center cursor-pointer overflow-hidden">
                                 {formValues.image ? (
                                     <img
-                                        src={typeof formValues.image === 'string' ? `http://localhost:3000${formValues.image}` : URL.createObjectURL(formValues.image)}
+                                        src={typeof formValues.image === 'string' ? `${baseURL}${formValues.image}` : URL.createObjectURL(formValues.image)}
                                         className="w-full p-3 h-full object-cover"
                                         alt="logo"
                                     />

@@ -1,5 +1,5 @@
-import { profile, User, UserTypes } from '../components/types/types';
-import api from './api';
+import { profile, User } from '../components/types/types';
+import {api} from '../apiConfig/api';
 
 export class UserService {
   static async getUsers(): Promise<User[]> {
@@ -8,8 +8,7 @@ export class UserService {
     return response.data.users;
   }
 
-  //get developers
-
+  //get users having role=developer
   static async getDevelopers(projectId: string): Promise<User[]> {
     try {
       const response = await api.get(`/users/${projectId}`);
@@ -21,20 +20,20 @@ export class UserService {
     }
   }
 
-  static async getUser(id: string) {
-    const response = await api.get(`/users/?id=${id}`);
-    return response?.data?.user || null;
-  }
+  // static async getUser(id: string) {
+  //   const response = await api.get(`/users/?id=${id}`);
+  //   return response?.data?.user || null;
+  // }
 
   //get assigned users on a project developrs and sqa
-  static async getAssignedUsers(projectId: number): Promise<User[]> {
-    const response = await api.get(`/users/${projectId}`);
-    const users: User[] | [] = response.data.developers;
-    if (users) {
-      return users;
-    }
-    return [];
-  }
+  // static async getAssignedUsers(projectId: number): Promise<User[]> {
+  //   const response = await api.get(`/users/${projectId}`);
+  //   const users: User[] | [] = response.data.developers;
+  //   if (users) {
+  //     return users;
+  //   }
+  //   return [];
+  // }
 
   static async updateProfile(data: FormData) {
     await api.patch('/users/update', data);

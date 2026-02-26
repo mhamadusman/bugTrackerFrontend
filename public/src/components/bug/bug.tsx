@@ -31,6 +31,13 @@ export default function Bug({ bugs, projectId, totalBugs, totalPages }: bugProps
     const [developers, setDevelopers] = useState<User[] | []>([])
     const [showLoading, setLoading] = useState(false)
     const [allBugs, setAllBugs] = useState<IBugWithDeveloper[]>(bugs)
+    const [prevBugs, setPrevBugs] = useState<IBugWithDeveloper[]>(bugs)
+
+    if (bugs !== prevBugs) {
+        setPrevBugs(bugs);
+        setAllBugs(bugs);
+        setLoading(false);
+    }
     const filterbugsUsingTitle = async (value: string) => {
         if (value.trim().length > 0) {
             router.push(`/dashboard/bugs?title=${value}&page=${currentPage}`)
@@ -81,16 +88,11 @@ export default function Bug({ bugs, projectId, totalBugs, totalPages }: bugProps
         }
         try {
             const developers = await UserService.getDevelopers(String(projectId))
-            const devs: User[] | [] = developers.filter((dev: User) => dev.userType === "developer")
-            setDevelopers(devs)
+            setDevelopers(developers)
         } catch (error) {
             console.error(error)
         }
     }
-    useEffect(() => {
-        setAllBugs(bugs);
-        setLoading(false)
-    }, [bugs]);
     return (
         <>
             <div className={`h-screen flex flex-col bg-gray-50 pt-20 overflow-hidden ${(isModalOpen || isDetailsOpen) ? 'blur-sm transition-all duration-300 pointer-events-none' : ''}`}>
@@ -183,7 +185,7 @@ export default function Bug({ bugs, projectId, totalBugs, totalPages }: bugProps
                                 </div>
                             ) : (
                                 gridView ? (
-                                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-2">
+                                    <div className="grid grid-cols-1 md:grid-cols-3  lg:grid-cols-3 gap-2">
                                         {allBugs.map((item) => (
                                             <BugCard
                                                 key={item.bug.bugId}

@@ -1,63 +1,32 @@
-import axios from 'axios';
-import variables from '../customVariables/custom_variables.json';
+import axios from 'axios'
 
-const api = axios.create({
-  baseURL: variables.baseUrl,
-  withCredentials: true, 
-});
-
-let isRefreshing = false;
-let failedQueue: any[] = [];
-
-const processQueue = (error: any, token: string | null = null) => {
-  failedQueue.forEach((prom) => {
-    if (error) {
-      prom.reject(error);
-    } else {
-      prom.resolve(token);
-    }
-  });
-  failedQueue = [];
-};
+export const api = axios.create({
+  baseURL: "/api", 
+  withCredentials: true,
+})
 
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config
+    if (error.response?.status === 401 && !originalRequest._retry && !originalRequest.url?.includes('/auth/login')) {
+      originalRequest._retry = true
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      
-      if (isRefreshing) {
-
-        return new Promise((resolve, reject) => {
-          failedQueue.push({ resolve, reject });
-        })
-          .then(() => api(originalRequest))
-          .catch((err) => Promise.reject(err));
+      if (originalRequest.url?.includes('/auth/refresh-token')) {
+        window.location.href = '/auth/login'
+        return Promise.reject(error)
       }
 
-      originalRequest._retry = true;
-      isRefreshing = true;
-
       try {
-        await axios.post(`${variables.baseUrl}/auth/refresh-token`, {}, { withCredentials: true });
+        await axios.post(`/api/auth/refresh-token`, {}, { withCredentials: true })
 
-        isRefreshing = false;
-        processQueue(null);
-        return api(originalRequest);
+        return api(originalRequest)
       } catch (refreshError) {
-        isRefreshing = false;
-        processQueue(refreshError, null);
-        
-        if (typeof window !== 'undefined') {
-          window.location.href = '/auth/login';
-        }
-        return Promise.reject(refreshError);
+       window.location.href = '/auth/login'
+        return Promise.reject(refreshError)
       }
     }
 
-    return Promise.reject(error);
-  }
-);
-
-export default api;
+    return Promise.reject(error)
+  },
+)

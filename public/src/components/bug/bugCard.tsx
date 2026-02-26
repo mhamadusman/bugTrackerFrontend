@@ -4,8 +4,8 @@ import { useState } from "react";
 import { IBugDTO, IBugWithDeveloper } from "../types/types";
 import { BugService } from "../../apiConfig/bugService";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import toast from "react-hot-toast";
-import variables from '../../customVariables/custom_variables.json'
 interface bugProps {
     item: IBugWithDeveloper,
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -16,7 +16,7 @@ interface bugProps {
     setAllBugs: React.Dispatch<React.SetStateAction<IBugWithDeveloper[]>>;
 }
 export default function BugCard({ item, setIsModalOpen, handleBugData, setEdit, role, handleViewDetails, setAllBugs }: bugProps) {
-    const baseUrl = variables.baseUrl
+  
     const router = useRouter()
     const [show, setShow] = useState<boolean>(false)
     const [showDropDown, setShowDropDown] = useState<boolean>(false)
@@ -92,7 +92,7 @@ export default function BugCard({ item, setIsModalOpen, handleBugData, setEdit, 
         setEdit((pre) => !pre);
         handleBugData(item.bug)
     }
-    const imgUrl = item.developer.image ? `${baseUrl}${item.developer.image}` : '/images/Profile.png'
+    const imgUrl = item.developer.image ? `/api${item.developer.image}` : '/images/Profile.png'
     return (
         <div className="bg-gray-100 py-3 border border-gray-100 px-6 mt-1 rounded-md shadow-sm relative cursor-pointer hover:bg-white hover:shadow-md transition-all">
             {role === "developer" && !item.bug.isClose && (
@@ -195,7 +195,7 @@ export default function BugCard({ item, setIsModalOpen, handleBugData, setEdit, 
                 <p className="text-[12px] text-gray-500">Assigned to</p>
                 <div className="flex items-center relative">
                     <div className="flex items-center space-x-1 overflow-hidden lg:mr-1">
-                        <img src={imgUrl} alt="" className="inline-block size-6 w-5 h-5 rounded-full ring-1 ring-white bg-black outline -outline-offset-1 outline-white" />
+                        <Image src={imgUrl} width={20}  height={20} unoptimized={true} alt="" className="inline-block size-6 w-5 h-5 rounded-full  bg-black outline -outline-offset-1 " />
                         <p className="capitalize text-gray-800 font-inter text-xs mr-3">{item.developer.name}</p>
                     </div>
                 </div>

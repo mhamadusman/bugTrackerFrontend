@@ -1,9 +1,9 @@
 
-import api from "./api";
+import {api} from "../apiConfig/api";
 export class ProjectService {
 
     static async createProject(data: FormData){
-        const response = await api.post('/projects/create' , data)
+        const response = await api.post('/projects' , data)
         return response.data
     }
 

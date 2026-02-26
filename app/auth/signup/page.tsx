@@ -21,12 +21,11 @@ export default function Signup() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const userRole = searchParams.get('role');
-
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
 
-    const { register, handleSubmit, watch, formState: { errors } } = useForm<FormData>({
+
+    const { register, handleSubmit, watch, setError, formState: { errors, isSubmitting } } = useForm<FormData>({
         defaultValues: {
             name: '',
             email: '',
@@ -37,17 +36,29 @@ export default function Signup() {
     });
 
     const onSubmit = async (data: FormData) => {
-
-        setLoading(true);
         try {
             await AuthSrvice.signup({ ...data, userType: userRole || '' });
             toast.success('Sign-up successful! Login to your account');
             router.push('/auth/login');
         } catch (error: any) {
-            const errorMsg = error?.response?.data?.message || "Something went wrong";
-            toast.error(`Sign-up failed: ${errorMsg}`);
-        } finally {
-            setLoading(false);
+            const backendErrors = error?.response?.data?.errors;
+            const genericMessage = error?.response?.data?.message || "Something went wrong";
+
+            if (Array.isArray(backendErrors)) {
+                backendErrors.forEach((err: { field: string; message: string }) => {
+                    if (err.field === 'userType') {
+                        toast.error(err.message)
+                        router.push('/auth')
+                    } else {
+                        setError(err.field as keyof FormData, {
+                            type: "server",
+                            message: err.message
+                        });
+                    }
+                });
+            } else {
+                toast.error(`Sign-up failed: ${genericMessage}`);
+            }
         }
     };
 
@@ -97,8 +108,10 @@ export default function Signup() {
                                 placeholder=" "
                                 className={`${inputBase} ${errors.phoneNumber ? 'border-red-500 focus:border-red-500' : 'border-gray-100 focus:border-blue-500 bg-gray-100'}`}
                                 {...register("phoneNumber", {
-                                    required: "Mobile number is required",
-                                    pattern: { value: /^\d{11}$/, message: "Must be exactly 11 digits" }
+                                    pattern: {
+                                        value: /^\d+$/,
+                                        message: "Must be digits"
+                                    }
                                 })}
                             />
                             <label className={`${labelBase} ${errors.phoneNumber ? "top-0 text-xs bg-gray-50 px-1 text-red-500" : ""}`}>
@@ -146,7 +159,7 @@ export default function Signup() {
                             </button>
                         </div>
 
-                        {/* Confirm Password */}
+                        {/* confirm Password */}
                         <div className="relative">
                             <Image src="/icons/lock.png" alt="icon" width={18} height={18} className={iconLeft} />
                             <input
@@ -169,10 +182,10 @@ export default function Signup() {
                         {/* Submit Button */}
                         <button
                             type="submit"
-                            disabled={loading}
+                            disabled={isSubmitting}
                             className="mybtn flex items-center justify-center gap-2"
                         >
-                            {loading ? <LoadingIndicator /> : (
+                            {isSubmitting ? <LoadingIndicator /> : (
                                 <>
                                     <span>Sign Up</span>
                                     <ArrowRight className="h-4 w-4" />

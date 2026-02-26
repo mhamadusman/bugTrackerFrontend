@@ -7,6 +7,7 @@ import variables from '../../customVariables/custom_variables.json'
 import toast from "react-hot-toast";
 import { LoadingIndicator } from "../loadingIndicator/loadingIndicator";
 import { useForm } from "react-hook-form";
+import { bugForm } from "../types/types";
 type img = string | null | File
 interface bugModelProps {
     isOpen: boolean;
@@ -19,13 +20,14 @@ interface bugModelProps {
     resetEdit: () => void;
     setAllBugs: React.Dispatch<React.SetStateAction<IBugWithDeveloper[]>>;
 }
+
 export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, resetEdit, developers, setAllBugs }: bugModelProps) {
     const baseUrl = variables.baseUrl
     const [images, setImages] = useState<(string | undefined)[]>([])
     const [openDev, setOpenDev] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [openType, setOpenType] = useState(false);
-    const { register, handleSubmit, setValue, watch, reset, formState: { errors, isSubmitting } } = useForm({
+    const { register, handleSubmit, setValue, watch, setError, reset, formState: { errors, isSubmitting } } = useForm<bugForm>({
         defaultValues: {
             title: "",
             description: "",
@@ -74,7 +76,6 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
     }
     const onFormSubmit = async (formData: any) => {
         try {
-
             const updatedBug = new FormData()
             updatedBug.append("title", formData.title)
             updatedBug.append("description", formData.description)
@@ -100,12 +101,21 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
             }
             handleState()
         } catch (error: any) {
-            toast.error(error?.response?.data.message || "Something went wrong");
-        } finally {
+            const backendErrors = error?.response?.data?.errors;
+            const genericMessage = error?.response?.data?.message || "Something went wrong";
+            if (Array.isArray(backendErrors)) {
+                backendErrors.forEach((err: { field: string; message: string }) => {
+                    setError(err.field as keyof bugForm, {
+                        type: "server",
+                        message: err.message
+                    });
+                });
+            } else {
+                toast.error(genericMessage);
+            }
 
         }
     }
-    //  if (isSubmitting) return <LoadingIndicator />
     if (!isOpen) return null;
     const imgValue = getImageValue()
     return (
@@ -127,7 +137,7 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                         <div className="flex flex-col px-6 py-4">
                             <div className="flex items-center gap-4 relative">
                                 <p className={`text-[10px] font-medium ${errors.developerId ? 'text-red-500' : 'text-gray-900'}`}>
-                                    {errors.developerId ? "Select Dev" : "Dev"}
+                                    {errors.developerId ? errors.developerId.message : "Dev"}
                                 </p>
                                 <div className="flex items-center gap-2">
                                     <div onClick={() => { setOpenDev(!openDev) }} className="flex items-center cursor-pointer">
@@ -144,7 +154,7 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                                     <span className={`text-[10px] font-medium truncate max-w-[80px] capitalize font-poppins ${errors.developerId ? 'text-red-500' : 'text-gray-600'}`}>
                                         {developers.find(d => d.id === formValues.developerId)?.name || ""}
                                     </span>
-                                    <input type="hidden" {...register("developerId", { required: true })} />
+                                    <input type="hidden" {...register("developerId", { required: "Select Dev" })} />
                                 </div>
                                 <div className="flex justify-center items-center gap-2">
                                     <p className={`text-[10px] font-medium relative font-inter ml-5 ${errors.deadline ? 'text-red-500' : 'text-gray-900'}`}>
@@ -188,8 +198,8 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                                                     setOpenDev(false);
                                                 }}
                                                 className={`px-3 py-2 text-[11px] cursor-pointer transition-colors flex items-center justify-between
-                                                    ${formValues.developerId === user.id ? 'bg-gray-100 text-blue-600 font-medium' : 'text-gray-600 hover:bg-gray-50'}
-                                                `}
+                                    ${formValues.developerId === user.id ? 'bg-gray-100 text-blue-600 font-medium' : 'text-gray-600 hover:bg-gray-50'}
+                                `}
                                             >
                                                 <span className="truncate capitalize">{user.name}</span>
                                                 {formValues.developerId === user.id && <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
@@ -199,12 +209,12 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                                 )}
                             </div>
                             <div className="mt-7">
-                                {errors.title && <p className="text-[10px] text-red-500 font-medium font-poppins mb-[-25px]">Title is required</p>}
+                                {errors.title && <p className="text-[10px] text-red-500 font-medium font-poppins">{errors.title.message}</p>}
                                 <input
                                     type="text"
                                     placeholder={errors.title ? "" : "Add title here"}
                                     className={`w-full text-2xl font-poppins outline-none border-b pb-1 ${errors.title ? 'border-red-500' : 'border-transparent'}`}
-                                    {...register("title", { required: true })}
+                                    {...register("title", { required: "Title is required" })}
                                 />
                             </div>
                             <div className="relative">
@@ -226,8 +236,8 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                                                     setOpenType(false);
                                                 }}
                                                 className={`px-3 py-2 text-xs cursor-pointer capitalize transition-colors
-                                                    ${formValues.type === type ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-700 hover:bg-gray-50'}
-                                                `}
+                                    ${formValues.type === type ? 'bg-gray-100 text-gray-900 font-medium' : 'text-gray-700 hover:bg-gray-50'}
+                                `}
                                             >
                                                 {type}
                                             </div>
@@ -237,12 +247,12 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                             </div>
                             <div>
                                 <label className={`block text-[10px] font-medium mt-3 mb-1 font-poppins ${errors.description ? 'text-red-500' : 'text-gray-900'}`}>
-                                    {errors.description ? "Description is required" : "Add here"}
+                                    {errors.description ? errors.description.message : "Add here"}
                                 </label>
                                 <input
                                     placeholder="Describe the issue..."
                                     className={`w-full border rounded-md p-2 text-xs outline-none font-poppins ${errors.description ? 'border-red-500' : 'border-gray-200'}`}
-                                    {...register("description", { required: true })}
+                                    {...register("description", { required: "Description is required" })}
                                 />
                             </div>
                             <div className="w-full h-25 mt-5">
@@ -274,7 +284,7 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                             type="submit"
                             disabled={isSubmitting}
                             className={`bg-blue-600 text-white text-xs font-semibold px-5 py-1.5 rounded transition-colors font-poppins flex items-center justify-center min-w-[80px]
-                             ${isSubmitting ? "opacity-70 cursor-not-allowed" : "hover:bg-blue-700 cursor-pointer"}`}
+             ${isSubmitting ? "opacity-70 cursor-not-allowed" : "hover:bg-blue-700 cursor-pointer"}`}
                         >
                             {isSubmitting ? (
                                 <div className="flex items-center gap-2">

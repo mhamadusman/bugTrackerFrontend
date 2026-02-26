@@ -1,18 +1,15 @@
 "use client"
+import { api } from '../../apiConfig/api';
 import { LogOutIcon } from 'lucide-react';
-import { logout } from '@/app/actions';
-import { useRouter } from 'next/navigation';
+import { redirect } from 'next/navigation';
+
 
 export default function Logout() {
-  const router = useRouter()
   const handleLogout = async () => {
-    await logout(); 
+    await api.post('/auth/log-out')
     localStorage.removeItem('user_profile');
     localStorage.removeItem('role');
-    const user = localStorage.getItem('user_profile')
-    console.log('user aftr logout  :: ' , user)
-    router.push('/auth/login');
-    router.refresh();
+    redirect('/auth/login')
   };
 
   return (

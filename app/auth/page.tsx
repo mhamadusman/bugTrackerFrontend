@@ -1,6 +1,6 @@
 "use client"
-import Link from 'next/link';
-import Image from 'next/image';
+import Link from 'next/link'
+import Image from 'next/image'
 
 export default function JoinUs() {
   return (
@@ -98,5 +98,5 @@ export default function JoinUs() {
         </div>
       </div>
     </div>
-  );
+  )
 }

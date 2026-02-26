@@ -1,42 +1,39 @@
 "use client"
-import { useState } from 'react';
-import Image from 'next/image';
-import Link from 'next/link';
-import { useForm } from 'react-hook-form'; // Added
-import { ArrowRight, Eye, EyeOff } from 'lucide-react';
-import { AuthSrvice } from '@/public/src/apiConfig/authService';
-import { useRouter } from 'next/navigation';
-import toast from 'react-hot-toast';
-import { LoadingIndicator } from '@/public/src/components/loadingIndicator/loadingIndicator';
+import { useState } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
+import { useForm } from 'react-hook-form'
+import { ArrowRight, Eye, EyeOff } from 'lucide-react'
+import { AuthSrvice } from '@/public/src/apiConfig/authService'
+import { useRouter } from 'next/navigation'
+import toast from 'react-hot-toast'
+import { LoadingIndicator } from '@/public/src/components/loadingIndicator/loadingIndicator'
 export default function Login() {
-    const router = useRouter();
-    const [showPassword, setShowPassword] = useState(false);
-    const [loading, setLoading] = useState(false);
+    const router = useRouter()
+    const [showPassword, setShowPassword] = useState(false)
     
-    const { register, handleSubmit, formState: { errors } } = useForm({
+    const { register, handleSubmit, formState: { errors , isSubmitting } } = useForm({
         defaultValues: {
             email: '',
             password: ''
         }
-    });
-    const inputBase = "peer w-full rounded-md border px-10 py-3 text-sm text-gray-900 outline-none transition-colors focus:bg-gray-50";
-    const labelBase = "pointer-events-none absolute left-10 top-1/2 -translate-y-1/2 text-sm text-gray-400 transition-all duration-200 px-1 peer-focus:top-0 peer-focus:text-sm peer-focus:text-gray-600 peer-not-placeholder-shown:top-0 peer-not-placeholder-shown:text-xs";
-    const iconLeft = "absolute left-3 top-1/2 -translate-y-1/2 opacity-40 peer-focus:opacity-70 transition-opacity z-10";
-    const eyeButton = "absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 focus:outline-none";
+    })
+    const inputBase = "peer w-full rounded-md border px-10 py-3 text-sm text-gray-900 outline-none transition-colors focus:bg-gray-50"
+    const labelBase = "pointer-events-none absolute left-10 top-1/2 -translate-y-1/2 text-sm text-gray-400 transition-all duration-200 px-1 peer-focus:top-0 peer-focus:text-sm peer-focus:text-gray-600 peer-not-placeholder-shown:top-0 peer-not-placeholder-shown:text-xs"
+    const iconLeft = "absolute left-3 top-1/2 -translate-y-1/2 opacity-40 peer-focus:opacity-70 transition-opacity z-10"
+    const eyeButton = "absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 focus:outline-none"
     const onSubmit = async (data: any) => {
-        setLoading(true);
         try {
-            await AuthSrvice.login(data);
-            router.push('/dashboard');
+            await AuthSrvice.login(data)
+            console.log('going to push router to dashboard') // remv it 
+             router.push('/dashboard')
         } catch (error: any) {
-            const err = error?.response?.data?.message || "Invalid credentials";
-            toast.error(err);
-        } finally {
-            setLoading(false);
-        }
+            const err = error?.response?.data?.message || "Invalid credentials"
+            toast.error(err)
+        } 
     }
     return (
-        <div className="font-poppins min-h-screen flex flex-col lg:flex-row bg-gray-50">
+        <div className="font-poppins min-h-screen  flex flex-col lg:flex-row  bg-gray-50">
             <div className="relative w-[460px] hidden lg:block">
                 <Image
                     src="/images/pic2.jpg"
@@ -47,11 +44,11 @@ export default function Login() {
                 <div className="absolute inset-0 bg-black/50"></div>
                 <Image src="/icons/logo.png" alt="Logo" width={192} height={42} className="absolute bottom-5 left-5 z-index-1" />
             </div>
-            <div className="flex-1 flex items-start lg:items-center justify-center pt-20 lg:pt-0">
+            <div className="flex-1 flex lg:items-center justify-center pt-30 lg:pt-0">
                 <div className="w-full max-w-[500px] lg:max-w-none px-6">
                     <div className="mb-8 lg:ml-40">
-                        <h1 className="text-3xl font-bold text-gray-900 mb-2">Login</h1>
-                        <p className="text-gray-400 text-sm">
+                        <h1 className="text-3xl font-bold text-gray-900 mb-2 ">Login</h1>
+                        <p className="text-gray-400 text-sm mb-16 lg:mb-0">
                             Please enter your login details
                         </p>
                     </div>
@@ -67,7 +64,7 @@ export default function Login() {
                                         message: "Invalid email format"
                                     }
                                 })}
-                                type="email"
+                                type="text"
                                 placeholder=" "
                                 className={`${inputBase} ${errors.email ? 'border-red-500 focus:border-red-500 bg-gray-50' : 'border-gray-100 focus:border-blue-500 bg-gray-100'}`}
                             />
@@ -75,7 +72,7 @@ export default function Login() {
                                 {errors.email ? errors.email.message : "Email"}
                             </label>
                         </div>
-                        {/* Password Field */}
+                        {/* password Field */}
                         <div className="relative">
                             <Image src="/icons/lock.png" alt="lock icon" width={18} height={18} className={iconLeft} />
                             <input
@@ -93,10 +90,10 @@ export default function Login() {
                         </div>
                         <button 
                             type="submit"
-                            disabled={loading}
-                            className="mybtn flex items-center justify-center gap-2"
+                            disabled={isSubmitting}
+                            className="mybtn flex items-center justify-center gap-2 mb-16 lg:mb-0"
                         >
-                            {loading ? (
+                            {isSubmitting ? (
                                 <LoadingIndicator />
                             ) : (
                                 <>
@@ -105,9 +102,9 @@ export default function Login() {
                                 </>
                             )}
                         </button>
-                        <hr className="border-t mt-10 border-gray-200 my-4" />
+                        <hr className="border-t mt-10 border-gray-200 my-4 " />
                         <div className="flex items-center justify-between text-sm">
-                            <p className="text-gray-500">Don't have an account?</p>
+                            <p className="text-gray-500 ">Don't have an account?</p>
                             <Link href="/" className="text-blue-700 font-medium">
                                 create Account
                             </Link>
@@ -116,5 +113,5 @@ export default function Login() {
                 </div>
             </div>
         </div>
-    );
+    )
 }

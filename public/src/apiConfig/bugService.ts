@@ -1,4 +1,4 @@
-import api from './api';
+import {api} from '../apiConfig/api'
 
 export class BugService {
   static async createBug(data: FormData) {
