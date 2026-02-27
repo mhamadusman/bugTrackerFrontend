@@ -61,7 +61,7 @@ export default function BugDetailsModel({ item, onClose, role, project }: BugDet
                                                                 <>
                                                                     <Image
                                                                         unoptimized={true}
-                                                                        src={`/api${s.image}`}
+                                                                        src={`${s.image}`}
                                                                         alt='qaImage'
                                                                         width={100}
                                                                         height={100}
@@ -121,7 +121,7 @@ export default function BugDetailsModel({ item, onClose, role, project }: BugDet
                                                                         unoptimized={true}
                                                                         width={100}
                                                                         height={100}
-                                                                        src={`/api${d.image}`}
+                                                                        src={`${d.image}`}
                                                                         alt='devImage'
                                                                         className="inline-block size-6 w-5 h-5 rounded-full "
                                                                     />
@@ -173,7 +173,7 @@ export default function BugDetailsModel({ item, onClose, role, project }: BugDet
                             <p className="text-[10px] text-gray-400 uppercase font-bold mb-2">Project Image</p>
                             {project.image && project.image !== "null" ? (
                                 <div className="w-full h-40 sm:h-48 bg-gray-50 border border-gray-100 rounded-sm overflow-hidden">
-                                    <img src={`/api${project.image}`} alt="project" className="w-full h-full object-contain" />
+                                    <img src={`${project.image}`} alt="project" className="w-full h-full object-contain" />
                                 </div>
                             ) : <div className="w-full h-24 border border-dashed border-gray-200 rounded-sm flex items-center justify-center text-gray-400 italic text-[11px]">No image provided</div>}
                         </div>
@@ -249,7 +249,7 @@ export default function BugDetailsModel({ item, onClose, role, project }: BugDet
                         <p className="text-[10px] text-gray-400 uppercase font-bold mb-2">Screenshoot</p>
                         {item?.bug?.screenshot && item?.bug?.screenshot !== "null" ? (
                             <div className="w-full h-40 sm:h-48 bg-gray-50 border border-gray-100 rounded-sm overflow-hidden">
-                                <img src={`/api${item?.bug.screenshot}`} alt="item?.bug" className="w-full h-full object-contain" />
+                                <img src={`${item?.bug.screenshot}`} alt="item?.bug" className="w-full h-full object-contain" />
                             </div>
                         ) : <div className="w-full h-24 border border-dashed border-gray-200 rounded-sm flex items-center justify-center text-gray-400 italic text-[11px]">No screenshot provided</div>}
                     </div>

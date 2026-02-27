@@ -7,7 +7,7 @@ import { ProjectService } from "../../apiConfig/projectService";
 import toast from 'react-hot-toast';
 import { useRouter } from "next/navigation";
 import { LoadingIndicator } from "../loadingIndicator/loadingIndicator";
-import { projectForm , imageType } from "../types/types";
+import { projectForm, imageType } from "../types/types";
 
 interface AddProjectModalProps {
     isOpen: boolean;
@@ -19,7 +19,7 @@ interface AddProjectModalProps {
     setAllProjects: React.Dispatch<React.SetStateAction<ProjectType[]>>;
 }
 
-const baseURL  = process.env.NEXT_BACKEND_URL
+const baseURL = process.env.NEXT_BACKEND_URL
 export default function Model({ isOpen, onClose, project, resetEdit, users, setAllProjects }: AddProjectModalProps) {
     const [devs, setDevs] = useState(false)
     const [model, setModel] = useState(false)
@@ -123,7 +123,7 @@ export default function Model({ isOpen, onClose, project, resetEdit, users, setA
             if (Array.isArray(backendErrors)) {
                 backendErrors.forEach((err: { field: string; message: string }) => {
 
-                    setError(err.field as keyof projectForm ,  {
+                    setError(err.field as keyof projectForm, {
                         type: "server",
                         message: err.message
                     });
@@ -234,7 +234,7 @@ export default function Model({ isOpen, onClose, project, resetEdit, users, setA
                             <div onClick={() => { fileInputRef.current?.click(); }} className="w-full aspect-square border-2 border-dashed border-gray-200 rounded-md flex flex-col items-center justify-center cursor-pointer overflow-hidden">
                                 {formValues.image ? (
                                     <img
-                                        src={typeof formValues.image === 'string' ? `${baseURL}${formValues.image}` : URL.createObjectURL(formValues.image)}
+                                        src={typeof formValues.image === 'string' ? `${formValues.image}` : URL.createObjectURL(formValues.image)}
                                         className="w-full p-3 h-full object-cover"
                                         alt="logo"
                                     />

@@ -21,7 +21,6 @@ interface bugModelProps {
 }
 
 export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, resetEdit, developers, setAllBugs }: bugModelProps) {
-    const baseUrl  = process.env.NEXT_BACKEND_URL
     const [images, setImages] = useState<(string | undefined)[]>([])
     const [openDev, setOpenDev] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -142,8 +141,8 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                                     <div onClick={() => { setOpenDev(!openDev) }} className="flex items-center cursor-pointer">
                                         <div className="flex -space-x-1">
                                             <div className="flex -space-x-2">
-                                                <img src={images[0] ? `${baseUrl}${images[0]}` : '/icons/user.png'} alt="dev-1" className="size-6 rounded-full ring-2 ring-white object-cover bg-black" />
-                                                <img src={images[1] ? `${baseUrl}${images[1]}` : '/icons/user.png'} alt="dev-2" className="size-6 rounded-full ring-2 ring-white object-contain bg-black/70" />
+                                                <img src={images[0] ? `$${images[0]}` : '/icons/user.png'} alt="dev-1" className="size-6 rounded-full ring-2 ring-white object-cover bg-black" />
+                                                <img src={images[1] ? `${images[1]}` : '/icons/user.png'} alt="dev-2" className="size-6 rounded-full ring-2 ring-white object-contain bg-black/70" />
                                             </div>
                                             <div className="flex items-center justify-center w-6 h-6 rounded-full border border-dotted border-black bg-gray-50 relative cursor-pointer hover:bg-gray-100 transition-colors">
                                                 <Plus size={12} className="text-white bg-gray-400 rounded-full absolute top-3 left-3" />
@@ -267,7 +266,7 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                                 />
                                 <div onClick={() => fileInputRef.current?.click()} className="w-full h-full rounded-md flex flex-col items-center justify-center cursor-pointer overflow-hidden">
                                     {imgValue ? (
-                                        <img src={imgValue.startsWith('blob:') ? imgValue : `${baseUrl}${imgValue}`} className="w-full h-full object-cover" alt="Preview" />
+                                        <img src={imgValue.startsWith('blob:') ? imgValue : `${imgValue}`} className="w-full h-full object-cover" alt="Preview" />
                                     ) : (
                                         <div className="flex items-center space-x-3">
                                             <CloudUpload className="text-gray-900 mb-1" size={24} />

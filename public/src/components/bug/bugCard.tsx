@@ -92,7 +92,7 @@ export default function BugCard({ item, setIsModalOpen, handleBugData, setEdit, 
         setEdit((pre) => !pre);
         handleBugData(item.bug)
     }
-    const imgUrl = item.developer.image ? `/api${item.developer.image}` : '/images/Profile.png'
+    const imgUrl = item.developer.image ? `${item.developer.image}` : '/images/Profile.png'
     return (
         <div className="bg-gray-100 py-3 border border-gray-100 px-6 mt-1 rounded-md shadow-sm relative cursor-pointer hover:bg-white hover:shadow-md transition-all">
             {role === "developer" && !item.bug.isClose && (

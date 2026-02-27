@@ -52,7 +52,7 @@ export default function Profile() {
         if (profileImage instanceof File) return URL.createObjectURL(profileImage);
         if (typeof profileImage === "string") {
             return profileImage.startsWith('blob:') || profileImage.startsWith('http')
-                ? profileImage : `/api${profileImage}`;
+                ? profileImage : `${profileImage}`;
         }
         return '/images/Profile.png';
     };

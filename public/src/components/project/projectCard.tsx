@@ -25,7 +25,7 @@ export default function ProjectCard({ project, sendProject, setIsModalOpen, hand
 
 
     const fallbackImage = '/icons/pro2.png';
-    const imageUrl = (project.image && project.image !== "null") ? `'/api'${project.image}` : fallbackImage;
+    const imageUrl = (project.image && project.image !== "null") ? `${project.image}` : fallbackImage;
     const onDetailsClick = (e: React.MouseEvent) => {
         e.stopPropagation();
         handleViewProjectDetails(project);

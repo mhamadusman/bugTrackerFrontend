@@ -44,7 +44,7 @@ export default function Navbar() {
       getProfile();
     }
   }, []);
-  const imgurl = user.image ? `/api${user.image}` : '/images/Profile.png';
+  const imgurl = user.image ? `${user.image}` : '/images/Profile.png';
   console.log('user image url in nav  :: ', imgurl)
   const pathname = usePathname();
   return (

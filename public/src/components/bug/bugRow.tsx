@@ -18,7 +18,7 @@ interface bugProps {
 }
 
 export default function BugRow({ item, setIsModalOpen, handleBugData, setEdit, setAllBugs , role, handleViewDetails }: bugProps) {
-    const baseUrl = process.env.NEXT_BACKEND_URL
+
     const router = useRouter()
     const [showDropDown, setShowDropDown] = useState<boolean>(false)
     const [show, setShow] = useState<boolean>(false)
@@ -97,7 +97,7 @@ export default function BugRow({ item, setIsModalOpen, handleBugData, setEdit, s
         handleBugData(item.bug)
     }
 
-    const imgUrl = item.developer.image ? `${baseUrl}${item.developer.image}` : '/icons/user.png'
+    const imgUrl = item.developer.image ? `${item.developer.image}` : '/icons/user.png'
 
    return (
     <div onClick={() => handleViewDetails(item)} className="w-full bg-white border border-gray-100 flex justify-between items-center px-3 py-3 hover:bg-gray-50 transition-all cursor-pointer group relative">
