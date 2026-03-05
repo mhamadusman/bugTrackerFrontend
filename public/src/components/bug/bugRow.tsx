@@ -3,8 +3,7 @@ import { MoreVertical, Calendar, Trash2, Edit2, CheckCircle, XCircle } from "luc
 import { useState, useRef } from "react";
 import { IBugDTO, IBugWithDeveloper } from "../types/types";
 import { BugService } from "../../apiConfig/bugService";
-import { useRouter } from 'next/navigation'
-
+import { getAxiosErrorMessage } from "../../utils/error";
 import toast from "react-hot-toast";
 
 interface bugProps {
@@ -18,8 +17,6 @@ interface bugProps {
 }
 
 export default function BugRow({ item, setIsModalOpen, handleBugData, setEdit, setAllBugs , role, handleViewDetails }: bugProps) {
-
-    const router = useRouter()
     const [showDropDown, setShowDropDown] = useState<boolean>(false)
     const [show, setShow] = useState<boolean>(false)
     const [isUpward, setIsUpward] = useState(false);
@@ -40,11 +37,21 @@ export default function BugRow({ item, setIsModalOpen, handleBugData, setEdit, s
 
     const updaBugStatus = async (bugStatus: string) => {
         try {
-            await BugService.updateBugStatus(bugStatus, String(item.bug.bugId))
-            router.refresh()
-            toast.success("Bug status updated")
-        } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Error updating status")
+            const response = await BugService.updateBugStatus(bugStatus, String(item.bug.bugId))
+            setAllBugs((prevBugs) =>
+                prevBugs.map((bugItem) =>
+                    bugItem.bug.bugId === item.bug.bugId
+                        ? {
+                            ...bugItem,
+                            bug: { ...bugItem.bug, status: bugStatus }
+                        }
+                        : bugItem
+                )
+            );
+            toast.success(response)
+        } catch (error: unknown) {
+            const {genericMessage} = getAxiosErrorMessage(error)
+            toast.error(genericMessage)
         }
     }
 
@@ -55,6 +62,20 @@ export default function BugRow({ item, setIsModalOpen, handleBugData, setEdit, s
             formData.append("isClose", String(isCloseValue));
             formData.append("status", newStatus);
             await BugService.updateBug(formData, String(item.bug.bugId));
+            setAllBugs((prevBugs) =>
+                prevBugs.map((bugItem) =>
+                    bugItem.bug.bugId === item.bug.bugId
+                        ? {
+                            ...bugItem,
+                            bug: {
+                                ...bugItem.bug,
+                                isClose: isCloseValue,
+                                status: newStatus
+                            }
+                        }
+                        : bugItem
+                )
+            );
             if (isCloseValue) {
                 toast.success("Bug Accepted & Closed");
             } else if (item.bug.isClose) {
@@ -62,10 +83,9 @@ export default function BugRow({ item, setIsModalOpen, handleBugData, setEdit, s
             } else {
                 toast.success("Bug Rejected");
             }
-
-            router.refresh();
-        } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Failed to update review status");
+        } catch (error: unknown) {
+            const {genericMessage} = getAxiosErrorMessage(error)
+            toast.error(genericMessage);
         }
     };
 
@@ -86,9 +106,10 @@ export default function BugRow({ item, setIsModalOpen, handleBugData, setEdit, s
         try {
             const response = await BugService.deleteBug(item.bug.bugId)
             setAllBugs((prev)=>prev.filter((p)=>p.bug.bugId !== item.bug.bugId))
-            toast.success(response.data.message)
-        } catch (error: any) {
-            toast.error(error?.response?.data?.message)
+            toast.success(response)
+        } catch (error: unknown) {
+            const {genericMessage} = getAxiosErrorMessage(error)
+            toast.error(genericMessage);
         }
     }
 

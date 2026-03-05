@@ -5,8 +5,8 @@ import Image from 'next/image'
 export default function JoinUs() {
   return (
     <div className="min-h-screen flex font-poppins">
-      {/* Left Side: Image */}
-      <div className="relative w-[460px] hidden lg:block">
+
+      <div className="relative w-115 hidden lg:block">
         <Image
           src="/images/pic2.jpg"
           alt="Workspace"
@@ -30,7 +30,7 @@ export default function JoinUs() {
         </div>
 
         <div className="flex-1 flex items-center justify-center">
-          <div className="w-full max-w-[450px] px-6">
+          <div className="w-full max-w-112.5 px-6">
             
             <div className="mb-10">
               <h1 className="font-bold text-3xl text-gray-900 mb-2">Join Us!</h1>

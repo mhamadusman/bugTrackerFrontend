@@ -7,6 +7,8 @@ import { projectToEdit } from "../types/types";
 import { ProjectType } from "../types/types";
 import toast from "react-hot-toast";
 import Image from "next/image";
+import { useUser } from "../../contexts/userContext";
+import { getAxiosErrorMessage } from "../../utils/error";
 
 
 interface projectCardProps {
@@ -22,6 +24,7 @@ export default function ProjectCard({ project, sendProject, setIsModalOpen, hand
     const router = useRouter();
     const [show, setShow] = useState<boolean>(false)
     const [role, setRole] = useState('')
+    const {user} = useUser()
 
 
     const fallbackImage = '/icons/pro2.png';
@@ -36,46 +39,38 @@ export default function ProjectCard({ project, sendProject, setIsModalOpen, hand
     };
 
     const handleEdit = async () => {
-        try {
-            const projectTobeEdit: projectToEdit = {
-                projectId: project.projectId,
-                name: project.name,
-                description: project.description,
-                image: project.image,
-                devTeam: project.devTeam || [],
-                qaTeam: project.qaTeam || []
-            }
-
-            sendProject(projectTobeEdit)
-            setIsModalOpen(true)
-        } catch (error: any) {
-            const errorMsg = error?.response?.data?.message || "Failed to edit project";
-            toast.error(errorMsg);
+        const projectTobeEdit: projectToEdit = {
+            projectId: project.projectId,
+            name: project.name,
+            description: project.description,
+            image: project.image,
+            devTeam: project.devTeam || [],
+            qaTeam: project.qaTeam || []
         }
+
+        sendProject(projectTobeEdit)
+        setIsModalOpen(true)
     }
 
     const deleteProject = async () => {
         try {
-            await ProjectService.deleteProject(project.projectId);
-
+            const response = await ProjectService.deleteProject(project.projectId);
             setAllProjects((prev) => prev.filter((p) => p.projectId !== project.projectId));
-
-            toast.success('Project deleted successfully');
-        } catch (error: any) {
-            const errorMsg = error?.response?.data?.message || "Failed to delete project";
-            toast.error(errorMsg);
+            toast.success(response);
+        } catch (error: unknown) {
+            const {genericMessage} = getAxiosErrorMessage(error)
+            toast.error(genericMessage);
         }
     };
 
     useEffect(() => {
         const update = () => {
-            const userRole = localStorage.getItem('role')
-            if (userRole) {
-                setRole(userRole)
+            if (user) {
+                setRole(user.role)
             }
         }
         update()
-    }, [])
+    }, [user])
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -125,7 +120,7 @@ export default function ProjectCard({ project, sendProject, setIsModalOpen, hand
                     {show && (
 
                         <>
-                        <div
+                            <div
                                 className="fixed inset-0 z-10 cursor-default"
                                 onClick={(e) => {
                                     e.stopPropagation();

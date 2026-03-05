@@ -6,12 +6,14 @@ import BugCard from "./bugCard";
 import BugModel from "./bugModel";
 import Pagination from "../pagination/pagination";
 import { useRouter } from "next/navigation";
-import BugDetailsModel from "./bugDetailsModel";
+import DetailsModel from "../detailModel/detailModel";
 import BugRow from "./bugRow";
 import { User } from '../types/types';
 import { UserService } from "../../apiConfig/userService";
 import { IBugDTO } from "../types/types";
 import { IBugWithDeveloper } from "../types/types";
+import { useUser } from "../../contexts/userContext";
+import { getAxiosErrorMessage } from "../../utils/error";
 interface bugProps {
     bugs: IBugWithDeveloper[]
     projectId: string
@@ -20,6 +22,7 @@ interface bugProps {
 }
 export default function Bug({ bugs, projectId, totalBugs, totalPages }: bugProps) {
     const router = useRouter()
+    const { user } = useUser()
     const [currentPage, setCurrentPage] = useState(1)
     const [role, setRole] = useState<string | null>('')
     const [isModalOpen, setIsModalOpen] = useState<boolean>(false)
@@ -73,11 +76,10 @@ export default function Bug({ bugs, projectId, totalBugs, totalPages }: bugProps
     const [bugToEdit, setBugToEdit] = useState<IBugDTO>(initialBugState);
     useEffect(() => {
         const updateRole = () => {
-            const userRole = localStorage.getItem('role')
-            setRole(userRole)
+            setRole(user?.role as string)
         }
         updateRole()
-    }, [])
+    }, [user])
     const handleBugData = (bugData: IBugDTO) => {
         setBugToEdit(bugData)
         getDevelopers(String(bugData.projectId))
@@ -89,8 +91,9 @@ export default function Bug({ bugs, projectId, totalBugs, totalPages }: bugProps
         try {
             const developers = await UserService.getDevelopers(String(projectId))
             setDevelopers(developers)
-        } catch (error) {
-            console.error(error)
+        } catch (error: unknown) {
+            const {genericMessage} = getAxiosErrorMessage(error)
+           console.error(genericMessage)
         }
     }
     return (
@@ -235,7 +238,7 @@ export default function Bug({ bugs, projectId, totalBugs, totalPages }: bugProps
                 resetEdit={() => { setIsModalOpen(false); setEdit(false); setBugToEdit(initialBugState) }}
             />
             {isDetailsOpen && selectedBug && (
-                <BugDetailsModel
+                <DetailsModel
                     item={selectedBug}
                     role={role as string}
                     onClose={() => setIsDetailsOpen(false)}

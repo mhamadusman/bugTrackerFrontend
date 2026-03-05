@@ -8,7 +8,8 @@ import toast from 'react-hot-toast';
 import { useRouter } from "next/navigation";
 import { LoadingIndicator } from "../loadingIndicator/loadingIndicator";
 import { projectForm, imageType } from "../types/types";
-
+import { getAxiosErrorMessage } from "../../utils/error";
+import { useUser } from "../../contexts/userContext";
 interface AddProjectModalProps {
     isOpen: boolean;
     onClose: () => void;
@@ -18,17 +19,11 @@ interface AddProjectModalProps {
     users: User[]
     setAllProjects: React.Dispatch<React.SetStateAction<ProjectType[]>>;
 }
-
-const baseURL = process.env.NEXT_BACKEND_URL
 export default function Model({ isOpen, onClose, project, resetEdit, users, setAllProjects }: AddProjectModalProps) {
     const [devs, setDevs] = useState(false)
     const [model, setModel] = useState(false)
+    const {user} = useUser()
     const router = useRouter()
-    const [user, setUser] = useState({
-        name: '',
-        image: '',
-        role: ''
-    })
     const [searchTerm, setSearchTerm] = useState("");
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { register, handleSubmit, setValue, watch, reset, setError, formState: { errors, isSubmitting } } = useForm<projectForm>({
@@ -56,12 +51,6 @@ export default function Model({ isOpen, onClose, project, resetEdit, users, setA
             reset({ name: '', description: '', developerIds: [], sqaIds: [], image: '', id: 0 });
         }
     }, [project, reset]);
-    useEffect(() => {
-        const user = localStorage.getItem('user_profile')
-        if (user) {
-            setUser(JSON.parse(user))
-        }
-    }, [])
     if (!isOpen) {
         return null;
     }
@@ -90,44 +79,35 @@ export default function Model({ isOpen, onClose, project, resetEdit, users, setA
         }
         setValue("developerIds", newIds, { shouldValidate: true });
     };
-    const onFormSubmit = async (data: any) => {
+    const onFormSubmit = async (data: projectForm) => {
         try {
             const formDataPayload = new FormData();
             formDataPayload.append("name", data.name);
             formDataPayload.append("description", data.description);
             formDataPayload.append("developerIds", data.developerIds.join(','));
             formDataPayload.append("sqaIds", data.sqaIds.join(','));
-            formDataPayload.append("managerName", 'ali');
-
+            formDataPayload.append("managerName", String(user?.name));
             if (data.image) {
                 formDataPayload.append("image", data.image);
             }
-
             if (data.id) {
-
                 const response = await ProjectService.updateProject(formDataPayload, data.id);
-                toast.success(response.message)
+                toast.success(response)
             } else {
-
                 const response = await ProjectService.createProject(formDataPayload);
-                toast.success(response.message);
+                toast.success(response);
             }
             router.refresh();
             handleState();
             reset();
-
-        } catch (error: any) {
-
-            const backendErrors = error?.response?.data?.errors;
-            const genericMessage = error?.response?.data?.message || "Something went wrong";
-            if (Array.isArray(backendErrors)) {
-                backendErrors.forEach((err: { field: string; message: string }) => {
-
+        } catch (error: unknown) {
+            const {genericMessage , errors} = getAxiosErrorMessage(error)
+            if (Array.isArray(errors)) {
+                errors.forEach((err: { field: string; message: string }) => {
                     setError(err.field as keyof projectForm, {
                         type: "server",
                         message: err.message
                     });
-
                 });
             } else {
                 toast.error(genericMessage);
@@ -195,7 +175,7 @@ export default function Model({ isOpen, onClose, project, resetEdit, users, setA
                             </div>
                             <div className="relative">
                                 <label className={`block text-[11px] font-light mb-1 ${errors.developerIds ? 'text-red-500' : 'text-gray-500'}`}>
-                                    {errors.developerIds ? "Please assign at least one Developer" : "Assign Developers"}
+                                    {errors.developerIds ? errors.developerIds.message : "Assign Developers"}
                                 </label>
                                 <div
                                     tabIndex={0}
@@ -252,7 +232,7 @@ export default function Model({ isOpen, onClose, project, resetEdit, users, setA
             {model && (
                 <div
                     onClick={() => { setModel(false); setSearchTerm(""); }}
-                    className="fixed inset-0 z-[60] flex items-center justify-center bg-black/10 backdrop-blur-sm"
+                    className="fixed inset-0 z-60 flex items-center justify-center bg-black/10 backdrop-blur-sm"
                 >
                     <div
                         onClick={(e) => e.stopPropagation()}

@@ -3,9 +3,9 @@ import { MoreVertical, Calendar, Edit2, Trash2, CheckCircle, XCircle } from "luc
 import { useState } from "react";
 import { IBugDTO, IBugWithDeveloper } from "../types/types";
 import { BugService } from "../../apiConfig/bugService";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import toast from "react-hot-toast";
+import { getAxiosErrorMessage } from "../../utils/error";
 interface bugProps {
     item: IBugWithDeveloper,
     setIsModalOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -16,13 +16,11 @@ interface bugProps {
     setAllBugs: React.Dispatch<React.SetStateAction<IBugWithDeveloper[]>>;
 }
 export default function BugCard({ item, setIsModalOpen, handleBugData, setEdit, role, handleViewDetails, setAllBugs }: bugProps) {
-  
-    const router = useRouter()
     const [show, setShow] = useState<boolean>(false)
     const [showDropDown, setShowDropDown] = useState<boolean>(false)
     const updaBugStatus = async (bugStatus: string) => {
         try {
-            await BugService.updateBugStatus(bugStatus, String(item.bug.bugId));
+            const response = await BugService.updateBugStatus(bugStatus, String(item.bug.bugId));
             setAllBugs((prevBugs) =>
                 prevBugs.map((bugItem) =>
                     bugItem.bug.bugId === item.bug.bugId
@@ -33,9 +31,10 @@ export default function BugCard({ item, setIsModalOpen, handleBugData, setEdit, 
                         : bugItem
                 )
             );
-            toast.success(`${item.bug.type} status is updated`);
-        } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Something went wrong");
+            toast.success(`${item.bug.type} ${response}`);
+        } catch (error: unknown) {
+            const {genericMessage} = getAxiosErrorMessage(error)
+            toast.error(genericMessage)
         }
     };
     const handleReview = async (isCloseValue: boolean) => {
@@ -67,8 +66,9 @@ export default function BugCard({ item, setIsModalOpen, handleBugData, setEdit, 
             } else {
                 toast.success(`${bugType} Rejected`);
             }
-        } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Failed to update review status");
+        } catch (error: unknown) {
+            const {genericMessage} = getAxiosErrorMessage(error)
+            toast.error(genericMessage)
         }
     };
     const getStatusStyles = (status: string) => {
@@ -83,9 +83,10 @@ export default function BugCard({ item, setIsModalOpen, handleBugData, setEdit, 
         try {
             const response = await BugService.deleteBug(item.bug.bugId)
             setAllBugs((prev) => prev.filter((p) => p.bug.bugId !== item.bug.bugId))
-            toast.success(response.data.message)
-        } catch (error: any) {
-            toast.error(error?.response?.data?.message)
+            toast.success(response)
+        } catch (error: unknown) {
+            const {genericMessage} = getAxiosErrorMessage(error)
+            toast.error(genericMessage)
         }
     }
     const handleEdit = async () => {

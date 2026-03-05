@@ -5,6 +5,7 @@ import { LogOutIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { LoadingIndicator } from '../loadingIndicator/loadingIndicator';
 import { toast } from 'react-hot-toast';
+import { getAxiosErrorMessage } from '../../utils/error';
 
 export default function Logout() {
   const [loading, setLoading] = useState(false);
@@ -14,22 +15,21 @@ export default function Logout() {
     setLoading(true);
     try {
       await api.post('/auth/log-out');
-      localStorage.removeItem('user_profile');
-      localStorage.removeItem('role');
       router.push('/auth/login');
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const {genericMessage} = getAxiosErrorMessage(error)
       setLoading(false);
-      toast.error(error?.response?.data?.message);
+      toast.error(genericMessage);
     }
   };
 
   return (
     <button 
       disabled={loading}
-      className={`flex items-center justify-center gap-2 font-poppins transition-all cursor-pointer text-sm w-full lg:w-auto
+      className={`flex items-center justify-center gap-2 font-poppins transition-all cursor-pointer text-sm w-full lg:w-full
         ${loading ? "opacity-70 cursor-not-allowed" : ""}
         lg:bg-blue-600 lg:text-white lg:px-4 lg:py-1.5 lg:rounded-sm lg:hover:bg-blue-700 
-        bg-red-50 text-red-600 p-3 rounded-xl hover:bg-red-100`}
+        bg-gray-100  p-3 rounded-xl hover:bg-gray-200`}
       onClick={handleLogout}
     >
       {loading ? (

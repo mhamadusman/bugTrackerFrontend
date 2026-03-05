@@ -6,6 +6,7 @@ import { BugService } from "../../apiConfig/bugService";
 import toast from "react-hot-toast";
 import { LoadingIndicator } from "../loadingIndicator/loadingIndicator";
 import { useForm } from "react-hook-form";
+import { getAxiosErrorMessage } from "../../utils/error";
 import { bugForm } from "../types/types";
 type img = string | null | File
 interface bugModelProps {
@@ -72,7 +73,7 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
         resetEdit();
         onClose();
     }
-    const onFormSubmit = async (formData: any) => {
+    const onFormSubmit = async (formData: bugForm) => {
         try {
             const updatedBug = new FormData()
             updatedBug.append("title", formData.title)
@@ -93,16 +94,16 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                     prev.map((item) => item.bug.bugId === response.bug.bugId ? response : item)
                 );
             } else {
-                const data = await BugService.createBug(updatedBug)
+                const data: IBugWithDeveloper = await BugService.createBug(updatedBug)
                 setAllBugs((prev) => [data, ...prev])
                 toast.success(formData.type === 'feature' ? "Feature added" : "Bug added")
             }
             handleState()
-        } catch (error: any) {
-            const backendErrors = error?.response?.data?.errors;
-            const genericMessage = error?.response?.data?.message || "Something went wrong";
-            if (Array.isArray(backendErrors)) {
-                backendErrors.forEach((err: { field: string; message: string }) => {
+        } catch (error: unknown) {
+            const {genericMessage , errors} = getAxiosErrorMessage(error)
+           
+            if (Array.isArray(errors)) {
+                errors.forEach((err: { field: string; message: string }) => {
                     setError(err.field as keyof bugForm, {
                         type: "server",
                         message: err.message
@@ -111,7 +112,6 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
             } else {
                 toast.error(genericMessage);
             }
-
         }
     }
     if (!isOpen) return null;
@@ -122,7 +122,7 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                 className="fixed inset-0 bg-black/10 backdrop-blur-[2px] z-[-1]"
                 onClick={handleState}
             />
-            <div className="bg-white w-full max-w-lg h-[550px] rounded-md shadow-lg flex flex-col overflow-hidden">
+            <div className="bg-white w-full max-w-lg h-137.5 rounded-md shadow-lg flex flex-col overflow-hidden">
                 <div className="w-full h-10 bg-gray-100 p-2 flex justify-end items-center">
                     <button type="button" onClick={handleState} className="bg-gray-900 p-1 rounded-sm cursor-pointer">
                         <X size={16} color="white" />
@@ -131,7 +131,7 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                 <form onSubmit={handleSubmit(onFormSubmit)} className="flex-1 flex flex-col overflow-hidden">
                     <div className="flex-1 flex flex-col">
                         <h2 className="text-lg font-medium text-gray-800 p-4 pb-2">{edit ? `Edit ${bugToEdit.type}` : "Add new task"} </h2>
-                        <div className="w-full h-[1px] bg-gray-200"></div>
+                        <div className="w-full h-px bg-gray-200"></div>
                         <div className="flex flex-col px-6 py-4">
                             <div className="flex items-center gap-4 relative">
                                 <p className={`text-[10px] font-medium ${errors.developerId ? 'text-red-500' : 'text-gray-900'}`}>
@@ -149,7 +149,7 @@ export default function BugModel({ isOpen, onClose, projectId, bugToEdit, edit, 
                                             </div>
                                         </div>
                                     </div>
-                                    <span className={`text-[10px] font-medium truncate max-w-[80px] capitalize font-poppins ${errors.developerId ? 'text-red-500' : 'text-gray-600'}`}>
+                                    <span className={`text-[10px] font-medium truncate max-w-20 capitalize font-poppins ${errors.developerId ? 'text-red-500' : 'text-gray-600'}`}>
                                         {developers.find(d => d.id === formValues.developerId)?.name || ""}
                                     </span>
                                     <input type="hidden" {...register("developerId", { required: "Select Dev" })} />

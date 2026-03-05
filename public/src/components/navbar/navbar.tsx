@@ -1,50 +1,17 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { profile } from "../types/types";
 import { Menu } from "lucide-react";
 import Logout from "../logout/logout";
-import { UserService } from '../../apiConfig/userService';
+import { useUser } from "../../contexts/userContext";
 
 export default function Navbar() {
 
   const [menu, setMenu] = useState<boolean>(false)
-  const [user, setUser] = useState({
-    name: '',
-    role: '',
-    image: ''
-  });
-
-  const getProfile = async () => {
-    try {
-      const data: profile = await UserService.getProfile();
-      const info = {
-        name: data.name,
-        role: data.role,
-        image: data.image
-      };
-      console.log('user profile in nav bar :: ', data)
-
-      setUser(info);
-      localStorage.setItem('user_profile', JSON.stringify(info));
-      localStorage.setItem('role', data.role);
-
-    } catch (error: any) {
-      localStorage.removeItem('user_profile');
-    }
-  };
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user_profile');
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    } else {
-      getProfile();
-    }
-  }, []);
-  const imgurl = user.image ? `${user.image}` : '/images/Profile.png';
+  const {user} = useUser()
+  const imgurl = user?.image ? `${user.image}` : '/images/Profile.png';
   console.log('user image url in nav  :: ', imgurl)
   const pathname = usePathname();
   return (
@@ -87,7 +54,7 @@ export default function Navbar() {
               <Link href="/dashboard/profile">
                 <div className="flex items-center gap-2 lg:bg-gray-100 px-3 py-1.5 rounded-lg">
                   <img src={imgurl} alt="user" className="rounded-full w-7 h-7" />
-                  <span className="text-sm font-medium text-gray-700 hidden lg:flex capitalize">{user.role}</span>
+                  <span className="text-sm font-medium text-gray-700 hidden lg:flex capitalize">{user?.role}</span>
                 </div>
               </Link>
               <div className="hidden lg:flex">

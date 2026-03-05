@@ -2,6 +2,7 @@ import { serverApi } from "@/serverApi/serverApi";
 import { IBugWithDeveloper } from "@/public/src/components/types/types";
 import { redirect } from "next/navigation"
 import Bug from "@/public/src/components/bug/bug";
+import { getAxiosErrorMessage } from "@/public/src/utils/error";
 
 
 interface projectIdProps {
@@ -25,8 +26,9 @@ export default async function BugsPage({ searchParams }: projectIdProps) {
     bugs = response.data.bugsWithDeveloper
     totalBugs = response.data.totalBugs
     totalPages = response.data.pages
-  } catch (error: any) {
-    console.error('error in getting bugs :: ', error.response.data.message)
+  } catch (error: unknown) {
+    const {genericMessage} = getAxiosErrorMessage(error)
+    console.error('error in getting bugs :: ', genericMessage)
     redirect('/auth/login')
   }
 

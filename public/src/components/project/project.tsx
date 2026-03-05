@@ -4,13 +4,15 @@ import { Search, Plus } from 'lucide-react'
 import { projectToEdit, ProjectType } from "../types/types";
 import ProjectCard from "./projectCard";
 import Model from "./model";
-import BugDetailsModel from "../bug/bugDetailsModel";
+import DetailsModel from "../detailModel/detailModel";
 import Pagination from "../pagination/pagination";
 import { useRouter } from "next/navigation";
 import debounce from 'lodash.debounce';
 import { UserService } from "../../apiConfig/userService";
 import { LoadingIndicator } from "../loadingIndicator/loadingIndicator";
+import { useUser } from "../../contexts/userContext";
 import { User } from "../types/types";
+import { getAxiosErrorMessage } from "../../utils/error";
 interface projectProps {
     projects: ProjectType[]
     totalPages: number
@@ -19,7 +21,7 @@ interface projectProps {
 export default function Project({ projects, totalPages, totalProjects }: projectProps) {
     const [allProjects, setAllProjects] = useState<ProjectType[]>([]);
     const router = useRouter()
-    const [role, setRole] = useState<string>('')
+    const { user } = useUser()
     const [isModalOpen, setIsModalOpen] = useState(false)
     const [project, setProject] = useState<projectToEdit | null>(null);
     const [selectedItem, setSelectedItem] = useState<ProjectType | null>(null)
@@ -28,11 +30,7 @@ export default function Project({ projects, totalPages, totalProjects }: project
     const [users, setUsers] = useState<User[]>([])
     const [showLoading, setLoading] = useState(false)
     const [projectName, setProjectName] = useState('')
-    const [user, setUser] = useState({
-        name: '',
-        role: '',
-        image: ''
-    });
+
     const filterProjectsUsingName = useMemo(() => debounce((value: string) => {
         if (value.trim().length > 0) {
             router.push(`/dashboard?name=${value}&page=${currentPage}`);
@@ -55,7 +53,6 @@ export default function Project({ projects, totalPages, totalProjects }: project
         setIsDetailsOpen(true);
     };
     const handleProjectData = (project: projectToEdit) => {
-        console.log('handling edit project data in parent component :: ', project)
         setProject({
             projectId: project.projectId,
             name: project.name,
@@ -68,39 +65,17 @@ export default function Project({ projects, totalPages, totalProjects }: project
     }
     const getUsers = async () => {
         try {
-            if (users.length > 0 || role !== "manager") {
+            if (users.length > 0 || user?.role !== "manager") {
                 return
             } else {
                 const usersData: User[] = await UserService.getUsers()
                 setUsers(usersData)
             }
-        } catch (error: any) {
-            console.log(error?.response?.data?.message)
+        } catch (error: unknown) {
+            const {genericMessage} = getAxiosErrorMessage(error)
+            console.error(genericMessage)
         }
     }
-    useEffect(() => {
-        const loadUser = async () => {
-            const role = localStorage.getItem('role');
-            if (role) setRole(role);
-            const storedUser = localStorage.getItem('user_profile');
-            if (storedUser) {
-                setUser(JSON.parse(storedUser));
-            } else {
-                const data = await UserService.getProfile();
-                const info = {
-                    name: data.name,
-                    role: data.role,
-                    image: data.image,
-                };
-                setUser(info);
-                localStorage.setItem('user_profile', JSON.stringify(info));
-            }
-            if (users.length === 0) {
-                getUsers()
-            }
-        };
-        loadUser();
-    }, []);
     useEffect(() => {
         setAllProjects(projects)
     }, [projects])
@@ -123,7 +98,7 @@ export default function Project({ projects, totalPages, totalProjects }: project
                         <div className="flex flex-col md:flex-row  justify-between gap-2  lg:gap-4">
                             <div className="border-l-4 border-[#43A67F] pl-4">
                                 <h5 className="font-poppins text-md lg:text-lg font-bold text-gray-900 ">Visnext Software Solutions</h5>
-                                <p className="font-poppins text-xs text-gray-400">Hi <span className="capitalize font-bold text-gray-700">{user.name}</span>, welcome to ManageBug</p>
+                                <p className="font-poppins text-xs text-gray-400">Hi <span className="capitalize font-bold text-gray-700">{user?.name}</span>, welcome to ManageBug</p>
                             </div>
                             <div className="flex  items-center justify-between gap-3">
                                 <div className={`relative`}>
@@ -140,7 +115,7 @@ export default function Project({ projects, totalPages, totalProjects }: project
                                         className="font-inter text-xs bg-gray-100 px-10 py-[11px] rounded-md outline-none w-64 border-none focus:ring-0 shadow-none"
                                     />
                                 </div>
-                                {(role === "manager") && (
+                                {(user?.role === "manager") && (
                                     <button
                                         onClick={() => {
                                             setIsModalOpen(true);
@@ -148,7 +123,7 @@ export default function Project({ projects, totalPages, totalProjects }: project
                                         }}
                                         className="bg-blue-600 text-white px-3 py-2 lg:px-4 lg:py-2 rounded-md text-sm flex items-center gap-2 cursor-pointer transition-colors hover:bg-blue-700"
                                     >
-                                        <Plus size={16} />  {role === "manager" ? <p className="text-xs lg:text-sm font-poppins">Add Project</p> : <p className="text-xs lg:text-sm font-poppins">Add Feature</p>}
+                                        <Plus size={16} />  {user?.role === "manager" ? <p className="text-xs lg:text-sm font-poppins">Add Project</p> : <p className="text-xs lg:text-sm font-poppins">Add Feature</p>}
                                     </button>
                                 )}
                             </div>
@@ -181,7 +156,7 @@ export default function Project({ projects, totalPages, totalProjects }: project
             <Model
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
-                role={role}
+                role={user?.role as string}
                 project={project}
                 setAllProjects={setAllProjects}
                 resetEdit={() =>
@@ -197,8 +172,8 @@ export default function Project({ projects, totalPages, totalProjects }: project
                 users={users}
             />
             {isDetailsOpen && selectedItem && (
-                <BugDetailsModel
-                    role={role}
+                <DetailsModel
+                    role={user?.role as string}
                     onClose={() => {
                         setIsDetailsOpen(false);
                         setSelectedItem(null);

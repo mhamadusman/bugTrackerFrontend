@@ -6,9 +6,14 @@ import { useForm } from 'react-hook-form'
 import { ArrowRight, Eye, EyeOff } from 'lucide-react'
 import { AuthSrvice } from '@/public/src/apiConfig/authService'
 import { useRouter } from 'next/navigation'
+import { useUser } from '@/public/src/contexts/userContext'
 import toast from 'react-hot-toast'
 import { LoadingIndicator } from '@/public/src/components/loadingIndicator/loadingIndicator'
+import { UserService } from '@/public/src/apiConfig/userService'
+import { loginDetails } from '@/public/src/components/types/types'
+import { getAxiosErrorMessage } from '@/public/src/utils/error'
 export default function Login() {
+    const {setUser} = useUser()
     const router = useRouter()
     const [showPassword, setShowPassword] = useState(false)
     
@@ -22,15 +27,17 @@ export default function Login() {
     const labelBase = "pointer-events-none absolute left-10 top-1/2 -translate-y-1/2 text-sm text-gray-400 transition-all duration-200 px-1 peer-focus:top-0 peer-focus:text-sm peer-focus:text-gray-600 peer-not-placeholder-shown:top-0 peer-not-placeholder-shown:text-xs"
     const iconLeft = "absolute left-3 top-1/2 -translate-y-1/2 opacity-40 peer-focus:opacity-70 transition-opacity z-10"
     const eyeButton = "absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 focus:outline-none"
-    const onSubmit = async (data: any) => {
+    const onSubmit = async (data: loginDetails) => {
         try {
             await AuthSrvice.login(data)
-            console.log('going to push router to dashboard') // remv it 
-             router.push('/dashboard')
-        } catch (error: any) {
-            const err = error?.response?.data?.message || "Invalid credentials"
-            toast.error(err)
-        } 
+            router.push('/dashboard')
+        } catch (error: unknown) {
+            const {genericMessage} = getAxiosErrorMessage(error)
+            toast.error(genericMessage)
+        }finally{
+            const user = await UserService.getProfile()
+            setUser(user)
+        }
     }
     return (
         <div className="font-poppins min-h-screen  flex flex-col lg:flex-row  bg-gray-50">

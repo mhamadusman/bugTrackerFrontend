@@ -1,19 +1,20 @@
 import {api} from '../apiConfig/api'
-
+import { IBugWithDeveloper } from '../components/types/types';
 export class BugService {
-  static async createBug(data: FormData) {
+  static async createBug(data: FormData): Promise<IBugWithDeveloper> {
     const response = await api.post('/bugs', data);
     return response.data
   }
 
-  static async updateBugStatus(bugStatus: string, bugId: string) {
-    await api.patch(`/bugs/${bugId}`, { status: bugStatus });
+  static async updateBugStatus(bugStatus: string, bugId: string){
+    const response = await api.patch(`/bugs/${bugId}`, { status: bugStatus });
+    return response.data.message
   }
   static async deleteBug(id: number) {
     const response  = await api.delete(`/bugs/${id}`)
-    return response
+    return response.data.message
   }
-  static async updateBug(data: FormData, bugId: string): Promise<any> {
+  static async updateBug(data: FormData, bugId: string) {
     const response = await api.patch(`/bugs/${bugId}`, data);
     return response.data
   }

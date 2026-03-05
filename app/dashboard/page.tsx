@@ -1,6 +1,7 @@
 import { serverApi } from "@/serverApi/serverApi"
 import { ProjectType } from "@/public/src/components/types/types"
 import Project from "@/public/src/components/project/project"
+import { getAxiosErrorMessage } from "@/public/src/utils/error"
 
 interface DashboardProps {
   searchParams: Promise<{ page: string, name: string, limit: string }>
@@ -20,8 +21,9 @@ export default async function DashboardPage({ searchParams }: DashboardProps) {
     projects = response.data.projectsWithDetails
     totalPages = response.data.pages
     totalProjects = response.data.totalProjects
-  } catch (error: any) {
-    console.error('error in fetching projects... ', error?.response?.message)
+  } catch (error: unknown) {
+    const { genericMessage } = getAxiosErrorMessage(error)
+    console.error('error in fetching projects... ', genericMessage)
   }
 
   return (

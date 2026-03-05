@@ -8,6 +8,7 @@ import { AuthSrvice } from '@/public/src/apiConfig/authService';
 import toast from 'react-hot-toast';
 import { LoadingIndicator } from '@/public/src/components/loadingIndicator/loadingIndicator';
 import { useForm } from 'react-hook-form';
+import { getAxiosErrorMessage } from '../../utils/error';
 
 type FormData = {
     name: string;
@@ -37,15 +38,13 @@ export default function Signup() {
 
     const onSubmit = async (data: FormData) => {
         try {
-            await AuthSrvice.signup({ ...data, userType: userRole || '' });
-            toast.success('Sign-up successful! Login to your account');
+            const response  = await AuthSrvice.signup({ ...data, userType: userRole || '' });
+            toast.success(response);
             router.push('/auth/login');
-        } catch (error: any) {
-            const backendErrors = error?.response?.data?.errors;
-            const genericMessage = error?.response?.data?.message || "Something went wrong";
-
-            if (Array.isArray(backendErrors)) {
-                backendErrors.forEach((err: { field: string; message: string }) => {
+        } catch (error: unknown) {
+            const{genericMessage , errors} = getAxiosErrorMessage(error)
+            if (Array.isArray(errors)) {
+                errors.forEach((err: { field: string; message: string }) => {
                     if (err.field === 'userType') {
                         toast.error(err.message)
                         router.push('/auth')
@@ -69,14 +68,14 @@ export default function Signup() {
 
     return (
         <div className="font-poppins min-h-screen flex flex-col lg:flex-row bg-gray-50">
-            <div className="relative w-[460px] hidden lg:block">
+            <div className="relative w-115 hidden lg:block">
                 <Image src="/images/pic2.jpg" alt="Workspace" fill className="object-cover" />
                 <div className="absolute inset-0 bg-black/40"></div>
                 <Image src="/icons/logo.png" alt="Workspace" width={192} height={42} className="absolute bottom-5 left-5 z-index-1" />
             </div>
 
             <div className="flex-1 flex items-start lg:items-center justify-center pt-20 mt-20 lg:mt-0 lg:pt-0">
-                <div className="w-full max-w-[500px] lg:max-w-none px-6">
+                <div className="w-full max-w-125 lg:max-w-none px-6">
                     <div className="mb-6 lg:mb-8 lg:ml-40">
                         <h1 className="text-2xl font-bold text-gray-900 mb-1">Sign Up</h1>
                         <p className="text-gray-400 text-sm mb-10 lg:mb-0">

@@ -6,6 +6,7 @@ export interface signup {
   phoneNumber: string;
   confirmPassword: string;
 }
+
 export type bugForm = {
     title: string,
     description: string,
@@ -87,13 +88,13 @@ export interface User {
   email: string;
 }
 
-type img = string | null | File;
+export type img = string | null | File;
 
 export interface profile {
   name: string;
   email: string;
   phoneNumber: string;
-  image: string;
+  image: img;
   role: string;
 }
 //bug

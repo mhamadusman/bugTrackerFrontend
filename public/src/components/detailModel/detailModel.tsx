@@ -12,7 +12,7 @@ interface BugDetailsProps {
     project?: ProjectType | null;
 }
 
-export default function BugDetailsModel({ item, onClose, role, project }: BugDetailsProps) {
+export default function DetailsModel({ item, onClose, role, project }: BugDetailsProps) {
     const [showDevDropdown, setShowDevDropdown] = useState(false);
     const [showSqaDropdown, setShowSqaDropdown] = useState(false);
     const getStatusStyles = (status: string) => {
@@ -25,7 +25,7 @@ export default function BugDetailsModel({ item, onClose, role, project }: BugDet
     }
     if (project?.projectId) {
         return (
-            <div className="fixed inset-0 z-[60] flex items-center justify-center bg-black/10 backdrop-blur-sm p-2 sm:p-4 font-poppins">
+            <div className="fixed inset-0 z-60 flex items-center justify-center bg-black/10 backdrop-blur-sm p-2 sm:p-4 font-poppins">
                 <div
                     className="fixed inset-0 bg-black/10 backdrop-blur-sm z-[-1]"
                     onClick={onClose}

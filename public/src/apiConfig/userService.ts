@@ -20,24 +20,10 @@ export class UserService {
     }
   }
 
-  // static async getUser(id: string) {
-  //   const response = await api.get(`/users/?id=${id}`);
-  //   return response?.data?.user || null;
-  // }
-
-  //get assigned users on a project developrs and sqa
-  // static async getAssignedUsers(projectId: number): Promise<User[]> {
-  //   const response = await api.get(`/users/${projectId}`);
-  //   const users: User[] | [] = response.data.developers;
-  //   if (users) {
-  //     return users;
-  //   }
-  //   return [];
-  // }
 
   static async updateProfile(data: FormData) {
     const response = await api.patch('/users/update', data);
-    return response
+    return response.data.message
   }
 
   static async getProfile(): Promise<profile> {

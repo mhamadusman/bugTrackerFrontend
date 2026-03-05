@@ -8,7 +8,7 @@ export class AuthSrvice {
     const  {confirmPassword , ...dataTosend} = userData
     console.log(dataTosend.userType)
     const response = await api.post("/auth/sign-up", dataTosend);
-    console.log("Signup Success:", response.data);
+   return response.data.message
 
   }
 
