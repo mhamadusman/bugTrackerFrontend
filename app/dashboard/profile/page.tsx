@@ -127,7 +127,7 @@ export default function Profile() {
                 <form onSubmit={handleSubmit(onFormSubmit)} className="flex flex-col justify-center items-center space-y-3 pb-10">
                     <div className="relative w-full max-w-md flex flex-col">
                         <div className="relative">
-                            <Image src="/images/profile.png" alt="icon" width={18} height={18} className={iconLeft} />
+                            <Image src="/images/Profile.png" alt="icon" width={18} height={18} className={iconLeft} />
                             <input
                                 type="text"
                                 {...register("name", { required: "Name is required" })}
@@ -141,7 +141,7 @@ export default function Profile() {
                     </div>
                     <div className="relative w-full max-w-md flex flex-col">
                         <div className="relative">
-                            <Image src="/images/solid.png" alt="icon" width={18} height={18} className={iconLeft} />
+                            <Image src="/images/Solid.png" alt="icon" width={18} height={18} className={iconLeft} />
                             <input
                                 type="tel"
                                 {...register("phoneNumber", {

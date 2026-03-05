@@ -41,7 +41,7 @@ export default function Login() {
     }
     return (
         <div className="font-poppins min-h-screen  flex flex-col lg:flex-row  bg-gray-50">
-            <div className="relative w-[460px] hidden lg:block">
+            <div className="relative w-115 hidden lg:block">
                 <Image
                     src="/images/pic2.jpg"
                     alt="Workspace"
@@ -52,7 +52,7 @@ export default function Login() {
                 <Image src="/icons/logo.png" alt="Logo" width={192} height={42} className="absolute bottom-5 left-5 z-index-1" />
             </div>
             <div className="flex-1 flex lg:items-center justify-center pt-30 lg:pt-0">
-                <div className="w-full max-w-[500px] lg:max-w-none px-6">
+                <div className="w-full max-w-125 lg:max-w-none px-6">
                     <div className="mb-8 lg:ml-40">
                         <h1 className="text-3xl font-bold text-gray-900 mb-2 ">Login</h1>
                         <p className="text-gray-400 text-sm mb-16 lg:mb-0">
