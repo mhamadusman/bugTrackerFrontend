@@ -18,14 +18,11 @@ export class BugService {
     const response = await api.patch(`/bugs/${bugId}`, data);
     return response.data
   }
-  static async getAllBugs(projectId: number): Promise<any> {
+  static async getAllBugs(projectId: number) {
     const response = await api.get('/bugs', {
       params: { projectId: projectId },
     });
     return response;
   }
-  static async getBugState(projectId: number): Promise<any> {
-    const response = await api.get(`/bugs/bugState?projectId=${projectId}`);
-    return response;
-  }
+
 }

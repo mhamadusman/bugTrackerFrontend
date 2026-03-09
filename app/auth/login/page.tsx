@@ -30,13 +30,12 @@ export default function Login() {
     const onSubmit = async (data: loginDetails) => {
         try {
             await AuthSrvice.login(data)
+            const user = await UserService.getProfile()
+            setUser(user)
             router.push('/dashboard')
         } catch (error: unknown) {
             const {genericMessage} = getAxiosErrorMessage(error)
             toast.error(genericMessage)
-        }finally{
-            const user = await UserService.getProfile()
-            setUser(user)
         }
     }
     return (

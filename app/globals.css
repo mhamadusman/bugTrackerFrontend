@@ -19,21 +19,21 @@
 }
 
 @layer utilities {
-  .blue-circle-icon {
-    @apply bg-blue-600 rounded-full w-9 h-9 flex shrink-0 text-white items-center justify-center shadow-sm;
-  }
+.user-box {
+  @apply w-full h-26 flex items-center justify-between p-5 rounded-sm border border-transparent hover:border-blue-400 shadow hover:bg-gray-200 transition-colors duration-200;
+}
+
+.blue-circle-icon {
+  @apply bg-blue-600 rounded-full w-9 h-9 flex shrink-0 items-center justify-center shadow-sm;
+}
+
 .blue-circle-icon-ghost {
-    @apply border border-blue-400 rounded-full w-9 h-9 flex shrink-0  items-center justify-center;
-    
-  }
+  @apply border border-blue-400 bg-white rounded-full w-9 h-9 flex shrink-0 items-center justify-center;
+}
 
-  .user-box {
-    @apply w-full flex  items-center justify-between p-5  rounded-sm hover:border-blue-500 hover:border  shadow hover:bg-gray-200;
-  }
-
-  .user-role {
-    @apply font-poppins font-bold text-gray-900 text-sm ;
-  }
+.user-role {
+  @apply text-sm font-semibold text-gray-900;
+}
 
   
   .mybtn{

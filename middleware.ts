@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 const BACKEND_URL = process.env.BACKEND_URL || process.env.LOCAL_BACKEND_URL;
 export async function middleware(request: NextRequest) {
-  console.log('inside middlw ware ')
   const { cookies, headers } = request
   const refreshToken = cookies.get('refresh_token')?.value
   const authToken = cookies.get('auth_token')?.value
